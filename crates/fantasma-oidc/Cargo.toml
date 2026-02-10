@@ -1,0 +1,23 @@
+[package]
+name = "fantasma-oidc"
+description = "OIDC provider implementation for Fantasma"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+fantasma-core = { workspace = true }
+fantasma-crypto = { workspace = true }
+fantasma-stark = { workspace = true }
+openidconnect = { workspace = true }
+oauth2 = { workspace = true }
+jsonwebtoken = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+url = { workspace = true }
+base64 = { workspace = true }
+thiserror = { workspace = true }
+async-trait = { workspace = true }

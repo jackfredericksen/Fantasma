@@ -1,0 +1,35 @@
+[package]
+name = "fantasma-server"
+description = "HTTP server for Fantasma OIDC provider"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "fantasma-server"
+path = "src/main.rs"
+
+[dependencies]
+fantasma-core = { workspace = true }
+fantasma-crypto = { workspace = true }
+fantasma-stark = { workspace = true }
+fantasma-oidc = { workspace = true }
+fantasma-proof-store = { workspace = true }
+tokio = { workspace = true }
+axum = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+config = { workspace = true }
+dotenvy = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+rand = { workspace = true }
+base64 = { workspace = true }
+hex = { workspace = true }

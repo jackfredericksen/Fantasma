@@ -1,0 +1,16 @@
+[package]
+name = "fantasma-core"
+description = "Core domain types for Fantasma ZK identity layer"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+hex = { workspace = true }
+zeroize = { workspace = true }

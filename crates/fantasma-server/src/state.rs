@@ -64,8 +64,10 @@ impl AppState {
         let _ = verifier.load_verification_key(CircuitType::CredentialVerification);
         let _ = verifier.load_verification_key(CircuitType::KycVerification);
 
-        // Register a demo client
+        // Register demo clients
         let mut clients = HashMap::new();
+
+        // Generic demo client
         clients.insert(
             "demo-client".to_string(),
             ClientInfo {
@@ -76,6 +78,19 @@ impl AppState {
                     "https://oauth.pstmn.io/v1/callback".to_string(),
                 ],
                 name: "Demo Client".to_string(),
+            },
+        );
+
+        // Demo relying party (examples/relying-party)
+        clients.insert(
+            "demo-rp".to_string(),
+            ClientInfo {
+                client_id: "demo-rp".to_string(),
+                client_secret: Some("demo-secret".to_string()),
+                redirect_uris: vec![
+                    "http://localhost:8080/callback".to_string(),
+                ],
+                name: "Demo Relying Party".to_string(),
             },
         );
 
@@ -92,8 +107,14 @@ impl AppState {
     /// Validate a redirect URI for a client
     pub fn validate_redirect_uri(&self, client_id: &str, redirect_uri: &str) -> bool {
         if let Some(client) = self.clients.get(client_id) {
-            client.redirect_uris.iter().any(|uri| uri == redirect_uri)
+            // Normalize URIs for comparison (remove trailing slashes)
+            let normalized_input = redirect_uri.trim_end_matches('/');
+            client.redirect_uris.iter().any(|uri| {
+                let normalized_registered = uri.trim_end_matches('/');
+                normalized_registered == normalized_input
+            })
         } else {
+            tracing::warn!("Unknown client_id: {}", client_id);
             false
         }
     }

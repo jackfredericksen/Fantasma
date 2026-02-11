@@ -161,7 +161,7 @@ impl CairoRunner {
     pub fn generate_proof(
         &self,
         trace_path: &Path,
-        memory_path: &Path,
+        _memory_path: &Path,
     ) -> Result<Vec<u8>, CairoError> {
         // In production, this would call stone-prover or stwo
         // For now, generate a deterministic mock proof
@@ -194,7 +194,7 @@ impl CairoRunner {
     pub fn verify_proof(
         &self,
         proof: &[u8],
-        public_inputs: &[String],
+        _public_inputs: &[String],
     ) -> Result<bool, CairoError> {
         // Basic validation
         if proof.len() < 100 {

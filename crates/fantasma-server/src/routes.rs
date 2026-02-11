@@ -2,7 +2,7 @@
 
 use axum::{
     extract::{Path, Query, State},
-    http::{header, StatusCode},
+    http::StatusCode,
     response::{Html, IntoResponse, Json, Redirect},
 };
 use fantasma_core::proof::ProofId;
@@ -435,5 +435,3 @@ pub async fn get_proof(
 pub async fn health() -> &'static str {
     "OK"
 }
-
-use base64::Engine;

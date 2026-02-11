@@ -164,9 +164,9 @@ impl Default for AgeVerificationWitnessBuilder {
 pub fn generate_witness(
     credential: &Credential,
     claim: &ClaimType,
-    user_secret: &[u8; 32],
-    verifier_domain: &str,
-    nonce: &[u8; 32],
+    _user_secret: &[u8; 32],
+    _verifier_domain: &str,
+    _nonce: &[u8; 32],
 ) -> Result<Witness, String> {
     match claim {
         ClaimType::AgeAtLeast { threshold } => {

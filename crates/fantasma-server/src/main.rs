@@ -2,24 +2,8 @@
 //!
 //! HTTP server for the Fantasma OIDC provider.
 
-use axum::{
-    extract::{Query, State},
-    http::StatusCode,
-    response::{IntoResponse, Json, Redirect},
-    routing::{get, post},
-    Router,
-};
-use fantasma_oidc::{
-    config::OidcConfig,
-    discovery::DiscoveryDocument,
-    token::{IdToken, IdTokenClaims, TokenResponse},
-    claims::ZkClaims,
-};
-use fantasma_proof_store::{InMemoryProofStore, ProofStore, StoredProof};
-use fantasma_stark::verifier::Verifier;
-use serde::{Deserialize, Serialize};
-use std::sync::Arc;
-use tokio::sync::RwLock;
+use axum::{routing::{get, post}, Router};
+use fantasma_oidc::config::OidcConfig;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};

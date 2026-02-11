@@ -1,7 +1,7 @@
 //! ID token generation and validation
 
 use crate::claims::ZkClaims;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;

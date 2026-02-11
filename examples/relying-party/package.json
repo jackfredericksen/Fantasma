@@ -1,0 +1,12 @@
+{
+  "name": "fantasma-demo-rp",
+  "version": "1.0.0",
+  "description": "Demo relying party for Fantasma ZK identity",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

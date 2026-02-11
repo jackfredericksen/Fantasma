@@ -186,7 +186,26 @@ zk:credential:license    # holds professional license
 zk:credential:membership # membership in org
 ```
 
-## Running
+## Quick Start
+
+```bash
+# Prerequisites: Rust 1.75+, Node.js 18+
+
+# Option 1: Run everything with one script
+./scripts/dev.sh
+
+# Option 2: Manual startup
+# Terminal 1 - Fantasma server
+cargo run -p fantasma-server
+
+# Terminal 2 - Demo app
+cd examples/relying-party
+npm install && npm start
+```
+
+Open <http://localhost:8080> and click "Login with Fantasma"
+
+## Running (Production)
 
 ```bash
 # Prerequisites: Rust 1.75+, PostgreSQL 15+
@@ -197,11 +216,12 @@ cargo build --workspace --release
 # Database setup
 createdb fantasma
 export DATABASE_URL="postgres://localhost/fantasma"
-cargo run -p fantasma-db --bin migrate  # or use sqlx-cli
+sqlx migrate run --source crates/fantasma-db/migrations
 
 # Run server
-FANTASMA_ISSUER="http://localhost:3000" \
+FANTASMA_ISSUER="https://id.yourdomain.com" \
 FANTASMA_BIND="0.0.0.0:3000" \
+DATABASE_URL="postgres://localhost/fantasma" \
 cargo run -p fantasma-server --release
 
 # Verify

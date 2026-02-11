@@ -10,6 +10,7 @@ members = [
     "crates/fantasma-server",
     "crates/fantasma-proof-store",
     "crates/fantasma-client-sdk",
+    "crates/fantasma-db",
 ]
 
 [workspace.package]
@@ -29,6 +30,7 @@ fantasma-wallet = { path = "crates/fantasma-wallet" }
 fantasma-issuer = { path = "crates/fantasma-issuer" }
 fantasma-proof-store = { path = "crates/fantasma-proof-store" }
 fantasma-client-sdk = { path = "crates/fantasma-client-sdk" }
+fantasma-db = { path = "crates/fantasma-db" }
 
 # Async runtime
 tokio = { version = "1.35", features = ["full"] }

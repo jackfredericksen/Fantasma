@@ -14,3 +14,4 @@ chrono = { workspace = true }
 uuid = { workspace = true }
 hex = { workspace = true }
 zeroize = { workspace = true }
+sha3 = { workspace = true }

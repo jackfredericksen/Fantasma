@@ -3,9 +3,8 @@
 //! Credentials are signed attestations from issuers containing user attributes.
 //! They form the basis for zero-knowledge proofs.
 
-use chrono::{DateTime, NaiveDate, Utc};
+use chrono::{DateTime, Datelike, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
-use zeroize::Zeroize;
 
 use crate::issuer::IssuerId;
 
@@ -50,8 +49,7 @@ impl SchemaId {
 }
 
 /// Attribute values that can be stored in credentials
-#[derive(Debug, Clone, Serialize, Deserialize, Zeroize)]
-#[zeroize(drop)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum AttributeValue {
     /// Date value (used for birthdates, graduation dates, etc.)
     Date(NaiveDate),

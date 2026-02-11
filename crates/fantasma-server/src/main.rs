@@ -54,6 +54,7 @@ async fn main() {
         .route("/.well-known/jwks.json", get(routes::jwks))
         // OIDC Core
         .route("/authorize", get(routes::authorize))
+        .route("/authorize/consent", get(routes::authorize_consent))
         .route("/token", post(routes::token))
         .route("/userinfo", get(routes::userinfo))
         // ZK Proof endpoints

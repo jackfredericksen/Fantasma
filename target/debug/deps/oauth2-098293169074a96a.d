@@ -1,0 +1,11 @@
+/Users/jack/Documents/Work/Fantasma/target/debug/deps/oauth2-098293169074a96a.d: /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/lib.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/basic.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/devicecode.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/revocation.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/helpers.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/reqwest.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/types.rs
+
+/Users/jack/Documents/Work/Fantasma/target/debug/deps/liboauth2-098293169074a96a.rmeta: /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/lib.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/basic.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/devicecode.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/revocation.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/helpers.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/reqwest.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/types.rs
+
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/lib.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/basic.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/devicecode.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/revocation.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/helpers.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/reqwest.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oauth2-4.4.2/src/types.rs:

@@ -1,0 +1,11 @@
+/Users/jack/Documents/Work/Fantasma/target/debug/deps/getrandom-87cd75bbcd6a4f36.d: /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/lib.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/backends.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/error.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/util.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/../README.md /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/backends/getentropy.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/backends/../utils/get_errno.rs
+
+/Users/jack/Documents/Work/Fantasma/target/debug/deps/libgetrandom-87cd75bbcd6a4f36.rmeta: /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/lib.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/backends.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/error.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/util.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/../README.md /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/backends/getentropy.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/backends/../utils/get_errno.rs
+
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/lib.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/backends.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/error.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/util.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/../README.md:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/backends/getentropy.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/backends/../utils/get_errno.rs:

@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Fantasma Wallet",
+  "version": "0.1.0",
+  "description": "Zero-knowledge identity wallet for privacy-preserving authentication",
+  "default_locale": "en",
+  "icons": {
+    "16": "assets/icon16.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "*://*.fantasma.example/*"
+  ],
+  "background": {
+    "service_worker": "src/background/index.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/index.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_popup": "src/popup/index.html",
+    "default_icon": {
+      "16": "assets/icon16.png",
+      "48": "assets/icon48.png"
+    },
+    "default_title": "Fantasma Wallet"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["src/content/inject.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+/Users/jack/Documents/Work/Fantasma/target/debug/deps/blake3-c05f8e5b597101e0.d: /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/lib.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/guts.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/hazmat.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/platform.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/ffi_neon.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/portable.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/io.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/join.rs
+
+/Users/jack/Documents/Work/Fantasma/target/debug/deps/libblake3-c05f8e5b597101e0.rmeta: /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/lib.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/guts.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/hazmat.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/platform.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/ffi_neon.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/portable.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/io.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/join.rs
+
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/lib.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/guts.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/hazmat.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/platform.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/ffi_neon.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/portable.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/io.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/src/join.rs:

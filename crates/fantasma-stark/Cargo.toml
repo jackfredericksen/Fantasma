@@ -16,3 +16,4 @@ hex = { workspace = true }
 sha3 = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
+chrono = { workspace = true }

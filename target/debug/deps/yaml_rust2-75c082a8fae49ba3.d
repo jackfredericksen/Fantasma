@@ -1,0 +1,11 @@
+/Users/jack/Documents/Work/Fantasma/target/debug/deps/yaml_rust2-75c082a8fae49ba3.d: /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/lib.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/char_traits.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/debug.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/emitter.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/parser.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/scanner.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/yaml.rs
+
+/Users/jack/Documents/Work/Fantasma/target/debug/deps/libyaml_rust2-75c082a8fae49ba3.rmeta: /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/lib.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/char_traits.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/debug.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/emitter.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/parser.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/scanner.rs /Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/yaml.rs
+
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/lib.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/char_traits.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/debug.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/emitter.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/parser.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/scanner.rs:
+/Users/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/yaml-rust2-0.8.1/src/yaml.rs:

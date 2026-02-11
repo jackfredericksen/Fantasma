@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fantasma Wallet</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0f0f23;
+      --bg-secondary: #1a1a3e;
+      --bg-card: #252550;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0cc;
+      --accent-purple: #8b5cf6;
+      --accent-blue: #3b82f6;
+      --accent-green: #10b981;
+      --border-color: #3b3b6d;
+    }
+
+    body {
+      width: 360px;
+      min-height: 500px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      color: var(--text-primary);
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .logo-text {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .lock-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .lock-btn:hover {
+      background: var(--bg-card);
+      color: var(--text-primary);
+    }
+
+    /* Screens */
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    /* Lock Screen */
+    .lock-screen {
+      text-align: center;
+      padding-top: 40px;
+    }
+
+    .lock-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--bg-card);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 28px;
+    }
+
+    .lock-screen h2 {
+      margin-bottom: 8px;
+    }
+
+    .lock-screen p {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--accent-purple);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+      color: white;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border-color);
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      background: var(--bg-card);
+      color: var(--text-primary);
+    }
+
+    .tab:hover:not(.active) {
+      color: var(--text-primary);
+    }
+
+    /* Credential Cards */
+    .credential-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .credential-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .credential-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+
+    .credential-type {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .credential-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--accent-purple);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .credential-info h4 {
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    .credential-info span {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .credential-badge {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--accent-green);
+    }
+
+    .credential-details {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .credential-details div {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-secondary);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 20px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green);
+    }
+
+    .status-dot.offline {
+      background: #ef4444;
+    }
+
+    /* Error message */
+    .error-message {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid #ef4444;
+      color: #ef4444;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .error-message.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon">F</div>
+        <span class="logo-text">Fantasma</span>
+      </div>
+      <button class="lock-btn" id="lockBtn" title="Lock Wallet">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Setup Screen (First Time) -->
+    <div class="screen" id="setupScreen">
+      <div class="lock-screen">
+        <div class="lock-icon">F</div>
+        <h2>Welcome to Fantasma</h2>
+        <p>Create a password to secure your wallet</p>
+
+        <div class="error-message" id="setupError"></div>
+
+        <form id="setupForm">
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="setupPassword" placeholder="Enter password" required>
+          </div>
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" id="setupConfirm" placeholder="Confirm password" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Create Wallet</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Lock Screen -->
+    <div class="screen" id="lockScreen">
+      <div class="lock-screen">
+        <div class="lock-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <h2>Wallet Locked</h2>
+        <p>Enter your password to unlock</p>
+
+        <div class="error-message" id="unlockError"></div>
+
+        <form id="unlockForm">
+          <div class="form-group">
+            <input type="password" id="unlockPassword" placeholder="Enter password" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Unlock</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Main Screen -->
+    <div class="screen" id="mainScreen">
+      <div class="tabs">
+        <button class="tab active" data-tab="credentials">Credentials</button>
+        <button class="tab" data-tab="activity">Activity</button>
+        <button class="tab" data-tab="settings">Settings</button>
+      </div>
+
+      <!-- Credentials Tab -->
+      <div class="tab-content" id="credentialsTab">
+        <div class="credential-list" id="credentialList">
+          <!-- Credentials loaded dynamically -->
+        </div>
+        <div class="empty-state" id="emptyCredentials" style="display: none;">
+          <div class="empty-state-icon">ID</div>
+          <p>No credentials yet</p>
+          <p style="font-size: 12px; margin-top: 8px;">Import credentials from verified issuers</p>
+        </div>
+      </div>
+
+      <!-- Activity Tab -->
+      <div class="tab-content" id="activityTab" style="display: none;">
+        <div class="empty-state">
+          <div class="empty-state-icon">...</div>
+          <p>No recent activity</p>
+        </div>
+      </div>
+
+      <!-- Settings Tab -->
+      <div class="tab-content" id="settingsTab" style="display: none;">
+        <div class="form-group">
+          <label>Auto-lock after (minutes)</label>
+          <input type="number" id="autoLockMinutes" value="15" min="1" max="60">
+        </div>
+        <button class="btn btn-secondary" id="saveSettings">Save Settings</button>
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <div class="status-indicator">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Connected</span>
+      </div>
+      <span id="walletVersion">v0.1.0</span>
+    </div>
+  </div>
+
+  <script type="module" src="index.js"></script>
+</body>
+</html>

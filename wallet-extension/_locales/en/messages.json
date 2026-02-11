@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Fantasma Wallet",
+    "description": "The name of the extension"
+  },
+  "extDescription": {
+    "message": "Zero-knowledge identity wallet for privacy-preserving authentication",
+    "description": "The description of the extension"
+  }
+}

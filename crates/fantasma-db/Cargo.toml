@@ -1,0 +1,21 @@
+[package]
+name = "fantasma-db"
+description = "PostgreSQL persistence layer for Fantasma"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+fantasma-core = { workspace = true }
+fantasma-crypto = { workspace = true }
+sqlx = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+async-trait = { workspace = true }
+hex = { workspace = true }

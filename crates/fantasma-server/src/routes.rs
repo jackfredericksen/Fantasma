@@ -2,20 +2,23 @@
 
 use axum::{
     extract::{Path, Query, State},
-    http::StatusCode,
-    response::{IntoResponse, Json, Redirect},
+    http::{header, StatusCode},
+    response::{Html, IntoResponse, Json, Redirect},
 };
 use fantasma_core::proof::ProofId;
 use fantasma_oidc::{
     claims::ZkClaims,
     discovery::DiscoveryDocument,
-    scopes::parse_scopes,
+    scopes::{parse_scopes, ZkScope},
     token::{IdToken, IdTokenClaims, TokenResponse},
 };
 use fantasma_proof_store::{ProofStore, StoredProof};
 use serde::{Deserialize, Serialize};
 
 use crate::state::AppState;
+
+/// HTML template for authorization consent page
+const AUTHORIZE_TEMPLATE: &str = include_str!("../templates/authorize.html");
 
 /// Discovery endpoint
 pub async fn discovery(State(state): State<AppState>) -> Json<DiscoveryDocument> {
@@ -43,39 +46,184 @@ pub struct AuthorizeParams {
     pub code_challenge_method: Option<String>,
 }
 
-/// Authorization endpoint
+/// Authorization endpoint - shows consent page
 pub async fn authorize(
     State(state): State<AppState>,
     Query(params): Query<AuthorizeParams>,
 ) -> impl IntoResponse {
     // Validate response type
     if params.response_type != "code" {
-        return Redirect::temporary(&format!(
-            "{}?error=unsupported_response_type",
-            params.redirect_uri
-        ));
+        return Html(format!(
+            "<h1>Error</h1><p>Unsupported response type: {}</p>",
+            params.response_type
+        ))
+        .into_response();
     }
 
     // Validate client and redirect URI
     if !state.validate_redirect_uri(&params.client_id, &params.redirect_uri) {
-        return Redirect::temporary(&format!(
-            "{}?error=invalid_request&error_description=invalid_redirect_uri",
-            params.redirect_uri
+        return Html("<h1>Error</h1><p>Invalid client or redirect URI</p>".to_string())
+            .into_response();
+    }
+
+    // Get client name
+    let client_name = state
+        .clients
+        .get(&params.client_id)
+        .map(|c| c.name.clone())
+        .unwrap_or_else(|| params.client_id.clone());
+
+    // Parse scopes and build permissions HTML
+    let scopes = parse_scopes(&params.scope);
+    let permissions_html = build_permissions_html(&scopes);
+
+    // Build allow/deny URLs
+    let query_string = build_query_string(&params);
+    let allow_url = format!("/authorize/consent?action=allow&{}", query_string);
+    let deny_url = format!(
+        "{}?error=access_denied&error_description=User%20denied%20access{}",
+        params.redirect_uri,
+        params.state.as_ref().map(|s| format!("&state={}", s)).unwrap_or_default()
+    );
+
+    // Render the template
+    let html = AUTHORIZE_TEMPLATE
+        .replace("{{CLIENT_NAME}}", &client_name)
+        .replace("{{PERMISSIONS}}", &permissions_html)
+        .replace("{{ALLOW_URL}}", &allow_url)
+        .replace("{{DENY_URL}}", &deny_url);
+
+    Html(html).into_response()
+}
+
+/// Build permissions HTML from scopes
+fn build_permissions_html(scopes: &[ZkScope]) -> String {
+    let mut html = String::new();
+
+    for scope in scopes {
+        let (icon_class, icon, title, description, has_zk): (&str, &str, String, &str, bool) = match scope {
+            ZkScope::OpenId => (
+                "identity",
+                "&#128100;",
+                "Basic Identity".to_string(),
+                "A pseudonymous identifier for this service",
+                false,
+            ),
+            ZkScope::Age { threshold } => (
+                "age",
+                "&#127874;",
+                format!("Age {} or older", threshold),
+                "Proves you meet the age requirement without revealing your birthdate",
+                true,
+            ),
+            ZkScope::Credential { credential_type } => {
+                let cred_name = credential_type.clone().unwrap_or_else(|| "credential".to_string());
+                (
+                    "credential",
+                    "&#128196;",
+                    format!("{} verification", cred_name),
+                    "Proves you hold this credential without revealing details",
+                    true,
+                )
+            }
+            ZkScope::Kyc { level } => (
+                "kyc",
+                "&#9989;",
+                format!("KYC {} status", level.as_str()),
+                "Proves your identity verification status without personal data",
+                true,
+            ),
+        };
+
+        let zk_badge = if has_zk {
+            r#"<span class="zk-badge">Zero-Knowledge Proof</span>"#
+        } else {
+            ""
+        };
+
+        html.push_str(&format!(
+            r#"<li class="permission-item">
+                <div class="permission-icon {}">{}</div>
+                <div class="permission-details">
+                    <h3>{}</h3>
+                    <p>{}</p>
+                    {}
+                </div>
+            </li>"#,
+            icon_class, icon, title, description, zk_badge
         ));
+    }
+
+    html
+}
+
+/// Build query string from params
+fn build_query_string(params: &AuthorizeParams) -> String {
+    let mut parts = vec![
+        format!("response_type={}", urlencoding::encode(&params.response_type)),
+        format!("client_id={}", urlencoding::encode(&params.client_id)),
+        format!("redirect_uri={}", urlencoding::encode(&params.redirect_uri)),
+        format!("scope={}", urlencoding::encode(&params.scope)),
+    ];
+
+    if let Some(ref state) = params.state {
+        parts.push(format!("state={}", urlencoding::encode(state)));
+    }
+    if let Some(ref nonce) = params.nonce {
+        parts.push(format!("nonce={}", urlencoding::encode(nonce)));
+    }
+    if let Some(ref challenge) = params.code_challenge {
+        parts.push(format!("code_challenge={}", urlencoding::encode(challenge)));
+    }
+    if let Some(ref method) = params.code_challenge_method {
+        parts.push(format!("code_challenge_method={}", urlencoding::encode(method)));
+    }
+
+    parts.join("&")
+}
+
+/// URL encoding helper
+mod urlencoding {
+    pub fn encode(s: &str) -> String {
+        url::form_urlencoded::byte_serialize(s.as_bytes()).collect()
+    }
+}
+
+/// Consent confirmation parameters
+#[derive(Debug, Deserialize)]
+pub struct ConsentParams {
+    pub action: String,
+    pub response_type: String,
+    pub client_id: String,
+    pub redirect_uri: String,
+    pub scope: String,
+    pub state: Option<String>,
+    pub nonce: Option<String>,
+    pub code_challenge: Option<String>,
+    pub code_challenge_method: Option<String>,
+}
+
+/// Consent confirmation endpoint
+pub async fn authorize_consent(
+    State(state): State<AppState>,
+    Query(params): Query<ConsentParams>,
+) -> impl IntoResponse {
+    if params.action != "allow" {
+        let mut redirect_url = format!(
+            "{}?error=access_denied&error_description=User%20denied%20access",
+            params.redirect_uri
+        );
+        if let Some(s) = params.state {
+            redirect_url.push_str(&format!("&state={}", s));
+        }
+        return Redirect::temporary(&redirect_url);
     }
 
     // Parse scopes
     let scopes = parse_scopes(&params.scope);
     let scope_strings: Vec<String> = scopes.iter().map(|s| s.to_string()).collect();
 
-    // In a real implementation, this would:
-    // 1. Show a consent page to the user
-    // 2. Trigger wallet connection for ZK proof generation
-    // 3. Wait for proofs to be submitted
-    // 4. Then issue the authorization code
-    //
-    // For demo purposes, we issue the code directly
-
+    // Create authorization code
     let code = state
         .create_auth_code(
             params.client_id,
@@ -183,7 +331,7 @@ pub async fn token(
         claims
     };
 
-    let id_token = IdToken::create(claims, &state.signing_key).map_err(|e| {
+    let id_token = IdToken::create(claims, state.signing_key.as_ref()).map_err(|e| {
         (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({

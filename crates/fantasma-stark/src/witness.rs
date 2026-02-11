@@ -1,7 +1,8 @@
 //! Witness generation for STARK circuits
 
-use fantasma_core::{ClaimType, Credential, KycLevel};
-use fantasma_crypto::hash::u32_to_bytes32;
+use chrono::Datelike;
+use fantasma_core::{ClaimType, Credential};
+use fantasma_crypto::hash::{sha3_256, u32_to_bytes32};
 use serde::{Deserialize, Serialize};
 
 use crate::circuit::CircuitType;
@@ -185,7 +186,7 @@ pub fn generate_witness(
                         + birthdate.day() as u32,
                 )
                 .salt(credential.commitment_salt)
-                .signature_hash(credential.signature.hash())
+                .signature_hash(sha3_256(&credential.signature.bytes))
                 .threshold(*threshold)
                 .verification_date(verification_date)
                 .credential_commitment(credential.commitment)
@@ -196,5 +197,3 @@ pub fn generate_witness(
         _ => Err("Unsupported claim type".to_string()),
     }
 }
-
-use chrono::Datelike;

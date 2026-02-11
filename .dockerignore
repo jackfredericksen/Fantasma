@@ -1,0 +1,43 @@
+# Build artifacts
+target/
+*.rs.bk
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docs
+*.md
+!README.md
+
+# Node (wallet extension)
+wallet-extension/node_modules/
+wallet-extension/dist/
+
+# Examples (built separately)
+examples/
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Environment
+.env*
+*.pem
+*.key
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+tmp/
+temp/
+*.log

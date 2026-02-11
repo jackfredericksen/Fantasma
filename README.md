@@ -201,9 +201,41 @@ cargo run -p fantasma-server
 # Terminal 2 - Demo app
 cd examples/relying-party
 npm install && npm start
+
+# Option 3: Docker (recommended for testing)
+./scripts/docker.sh demo
 ```
 
 Open <http://localhost:8080> and click "Login with Fantasma"
+
+## Docker
+
+```bash
+# Start server + PostgreSQL
+./scripts/docker.sh up
+
+# Start with demo relying party
+./scripts/docker.sh demo
+
+# View logs
+./scripts/docker.sh logs
+
+# Stop everything
+./scripts/docker.sh down
+
+# Clean up (removes volumes)
+./scripts/docker.sh clean
+```
+
+Or use docker compose directly:
+
+```bash
+# Just the server
+docker compose up -d
+
+# With demo app
+docker compose --profile demo up -d
+```
 
 ## Running (Production)
 

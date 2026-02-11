@@ -9,6 +9,7 @@ use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod routes;
+mod seeds;
 mod state;
 
 use state::AppState;
@@ -46,6 +47,9 @@ async fn main() {
         .route("/proofs/:id", get(routes::get_proof))
         // Health check
         .route("/health", get(routes::health))
+        // Demo/seed data endpoints
+        .route("/demo/users", get(routes::demo_users))
+        .route("/demo/seeds", get(routes::seeds))
         .with_state(state)
         .layer(CorsLayer::new().allow_origin(Any).allow_methods(Any).allow_headers(Any))
         .layer(TraceLayer::new_for_http());

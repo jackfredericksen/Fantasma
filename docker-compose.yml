@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database
+  postgres:
+    image: postgres:16-alpine
+    container_name: fantasma-db
+    environment:
+      POSTGRES_DB: fantasma
+      POSTGRES_USER: fantasma
+      POSTGRES_PASSWORD: fantasma_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./crates/fantasma-db/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fantasma -d fantasma"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Fantasma OIDC Server
+  fantasma-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fantasma-server
+    ports:
+      - "3000:3000"
+    environment:
+      RUST_LOG: fantasma_server=debug,tower_http=debug
+      FANTASMA_ISSUER: http://localhost:3000
+      FANTASMA_BIND: 0.0.0.0:3000
+      DATABASE_URL: postgres://fantasma:fantasma_dev_password@postgres:5432/fantasma
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Demo relying party (optional)
+  demo-rp:
+    image: node:20-alpine
+    container_name: fantasma-demo-rp
+    working_dir: /app
+    ports:
+      - "8080:8080"
+    environment:
+      FANTASMA_URL: http://fantasma-server:3000
+    volumes:
+      - ./examples/relying-party:/app:ro
+    command: sh -c "npm install --silent && npm start"
+    depends_on:
+      - fantasma-server
+    profiles:
+      - demo
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: fantasma-network

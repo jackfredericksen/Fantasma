@@ -6,6 +6,15 @@ Cargo.lock
 node_modules/
 dist/
 *.log
+package-lock.json
+
+# Cairo/Scarb
+circuits/target/
+*.sierra
+*.casm
+
+# SQLx
+.sqlx/
 
 # IDE
 .idea/
@@ -19,8 +28,32 @@ dist/
 .env.local
 *.pem
 *.key
+*.secret
 
 # Build artifacts
 *.so
 *.dylib
 *.dll
+
+# Test artifacts
+*.profraw
+lcov.info
+coverage/
+tarpaulin-report.html
+
+# Proof files (generated during testing)
+*.proof
+proofs/
+
+# WASM
+pkg/
+*.wasm
+
+# OS
+Thumbs.db
+*~
+
+# Temporary
+tmp/
+temp/
+*.tmp

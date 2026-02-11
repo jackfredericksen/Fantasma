@@ -435,3 +435,50 @@ pub async fn get_proof(
 pub async fn health() -> &'static str {
     "OK"
 }
+
+/// Seed data endpoint - returns demo users and credentials
+pub async fn seeds() -> Json<serde_json::Value> {
+    let data = crate::seeds::SeedData::generate();
+    Json(serde_json::to_value(data).unwrap())
+}
+
+/// Demo user selection - returns available demo users
+pub async fn demo_users() -> Json<serde_json::Value> {
+    let data = crate::seeds::SeedData::generate();
+    let users: Vec<serde_json::Value> = data
+        .users
+        .iter()
+        .map(|u| {
+            let cred_summary: Vec<String> = u
+                .credentials
+                .iter()
+                .map(|c| match &c.credential_type {
+                    fantasma_core::credential::CredentialType::Identity { birthdate, .. } => {
+                        format!("Identity (DOB: {})", birthdate)
+                    }
+                    fantasma_core::credential::CredentialType::Kyc { level, .. } => {
+                        format!("KYC ({})", level.as_str())
+                    }
+                    fantasma_core::credential::CredentialType::Degree { degree_type, field_of_study, .. } => {
+                        format!("{} in {}", degree_type, field_of_study)
+                    }
+                    fantasma_core::credential::CredentialType::License { license_type, .. } => {
+                        format!("License: {}", license_type)
+                    }
+                    fantasma_core::credential::CredentialType::Membership { organization, .. } => {
+                        format!("Member: {}", organization)
+                    }
+                })
+                .collect();
+
+            serde_json::json!({
+                "id": u.id,
+                "name": u.name,
+                "email": u.email,
+                "credentials": cred_summary
+            })
+        })
+        .collect();
+
+    Json(serde_json::json!({ "users": users }))
+}

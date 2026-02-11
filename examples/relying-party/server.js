@@ -566,6 +566,62 @@ function renderPage(session) {
           </div>
         </div>
       </div>
+
+      <div class="card">
+        <h2>Test Scenarios</h2>
+        <div style="font-size: 13px; color: #888; line-height: 1.8;">
+          <table style="width: 100%; border-collapse: collapse; margin-top: 12px;">
+            <thead>
+              <tr style="text-align: left; border-bottom: 1px solid #2a2a4a;">
+                <th style="padding: 8px; color: #aaa;">User</th>
+                <th style="padding: 8px; color: #aaa;">Age 18+</th>
+                <th style="padding: 8px; color: #aaa;">Age 21+</th>
+                <th style="padding: 8px; color: #aaa;">KYC Basic</th>
+                <th style="padding: 8px; color: #aaa;">KYC Enhanced</th>
+                <th style="padding: 8px; color: #aaa;">Degree</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid #1a1a3a;">
+                <td style="padding: 8px;"><strong>Alice</strong> <span style="color:#666">(DOB: 1990)</span></td>
+                <td style="padding: 8px; color: #4ade80;">✓</td>
+                <td style="padding: 8px; color: #4ade80;">✓</td>
+                <td style="padding: 8px; color: #4ade80;">✓</td>
+                <td style="padding: 8px; color: #4ade80;">✓</td>
+                <td style="padding: 8px; color: #4ade80;">✓</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #1a1a3a;">
+                <td style="padding: 8px;"><strong>Bob</strong> <span style="color:#666">(DOB: 2005)</span></td>
+                <td style="padding: 8px; color: #4ade80;">✓</td>
+                <td style="padding: 8px; color: #f87171;">✗</td>
+                <td style="padding: 8px; color: #4ade80;">✓</td>
+                <td style="padding: 8px; color: #f87171;">✗</td>
+                <td style="padding: 8px; color: #f87171;">✗</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #1a1a3a;">
+                <td style="padding: 8px;"><strong>Carol</strong> <span style="color:#666">(DOB: 2010)</span></td>
+                <td style="padding: 8px; color: #f87171;">✗</td>
+                <td style="padding: 8px; color: #f87171;">✗</td>
+                <td style="padding: 8px; color: #f87171;">✗</td>
+                <td style="padding: 8px; color: #f87171;">✗</td>
+                <td style="padding: 8px; color: #f87171;">✗</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px;"><strong>Dave</strong> <span style="color:#666">(DOB: 1975)</span></td>
+                <td style="padding: 8px; color: #4ade80;">✓</td>
+                <td style="padding: 8px; color: #4ade80;">✓</td>
+                <td style="padding: 8px; color: #4ade80;">✓</td>
+                <td style="padding: 8px; color: #4ade80;">✓</td>
+                <td style="padding: 8px; color: #f87171;">✗</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="margin-top: 12px; color: #666; font-size: 11px;">
+            Note: In production, users would load these credentials into their Fantasma wallet extension.
+            For this demo, the server simulates pre-verified credentials.
+          </p>
+        </div>
+      </div>
     `}
   </div>
 

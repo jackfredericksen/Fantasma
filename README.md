@@ -16,16 +16,16 @@ Post-quantum zero-knowledge identity provider. Prove who you are without reveali
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                                                                             │
-│   User Wallet          Fantasma Server              Relying Party          │
-│   ───────────          ──────────────              ──────────────          │
+│   User Wallet          Fantasma Server              Relying Party           │
+│   ───────────          ──────────────              ──────────────           │
 │                                                                             │
-│   ┌───────────┐        ┌─────────────┐             ┌─────────────┐         │
-│   │Credentials│───────▶│ OIDC + ZK   │◀────────────│  OAuth2     │         │
-│   │  (local)  │  STARK │   Proofs    │  Standard   │   Client    │         │
-│   └───────────┘  proof └─────────────┘  OIDC flow  └─────────────┘         │
+│   ┌───────────┐        ┌─────────────┐             ┌─────────────┐          │
+│   │Credentials│───────▶│ OIDC + ZK   │◀────────────│  OAuth2     │          │
+│   │  (local)  │  STARK │   Proofs    │  Standard   │   Client    │          │
+│   └───────────┘  proof └─────────────┘  OIDC flow  └─────────────┘          │
 │                                                                             │
-│   Dilithium sigs       Cairo/STARK                 No code changes         │
-│   AES-256-GCM          PostgreSQL                  needed                  │
+│   Dilithium sigs       Cairo/STARK                 No code changes          │
+│   AES-256-GCM          PostgreSQL                  needed                   │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -96,7 +96,7 @@ fantasma/
         │◀─────────────────────────────┤                             │
         │                              │                             │
         │         5. Redirect with code                              │
-        │─────────────────────────────────────────────────────────▶ │
+        │─────────────────────────────────────────────────────────▶  │
         │                              │                             │
         │                              │  6. Exchange code for token │
         │                              │◀────────────────────────────│

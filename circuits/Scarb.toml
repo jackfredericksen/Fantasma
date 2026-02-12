@@ -8,4 +8,8 @@ edition = "2024_07"
 [dev-dependencies]
 cairo_test = "2.9.2"
 
-[[target.starknet-contract]]
+[cairo]
+enable-gas = false
+
+# Library target - circuits are compiled and used by prover
+[lib]

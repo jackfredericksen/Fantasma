@@ -15,7 +15,9 @@
     "scripting"
   ],
   "host_permissions": [
-    "*://*.fantasma.example/*"
+    "*://*.fantasma.example/*",
+    "http://localhost:3000/*",
+    "http://localhost:8080/*"
   ],
   "background": {
     "service_worker": "src/background/index.js",

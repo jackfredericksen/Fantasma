@@ -2,7 +2,7 @@
 // Uses Poseidon hash which is STARK-friendly and post-quantum secure
 
 use core::poseidon::PoseidonTrait;
-use core::hash::{HashStateTrait, HashStateExTrait};
+use core::hash::HashStateTrait;
 
 /// Hash two field elements using Poseidon
 pub fn hash_pair(a: felt252, b: felt252) -> felt252 {

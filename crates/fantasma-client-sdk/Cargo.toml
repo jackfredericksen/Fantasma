@@ -9,6 +9,7 @@ repository.workspace = true
 [dependencies]
 fantasma-core = { workspace = true }
 fantasma-oidc = { workspace = true }
+fantasma-stark = { workspace = true }
 openidconnect = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
@@ -17,3 +18,17 @@ thiserror = { workspace = true }
 url = { workspace = true }
 async-trait = { workspace = true }
 tokio = { workspace = true }
+base64 = { workspace = true }
+uuid = { workspace = true }
+
+[[example]]
+name = "relying_party"
+path = "examples/relying_party.rs"
+
+[[example]]
+name = "proof_generation"
+path = "examples/proof_generation.rs"
+
+[[example]]
+name = "token_verification"
+path = "examples/token_verification.rs"

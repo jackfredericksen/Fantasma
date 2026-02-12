@@ -249,6 +249,7 @@ pub fn export_seed_data_json() -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use chrono::Datelike;
 
     #[test]
     fn test_seed_data_generation() {

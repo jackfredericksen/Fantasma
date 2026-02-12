@@ -11,7 +11,7 @@ pub fn verify_merkle_proof(
     indices: Span<bool>, // false = left, true = right
     root: felt252
 ) -> bool {
-    assert(proof.len() == indices.len(), 'proof and indices length mismatch');
+    assert(proof.len() == indices.len(), 'proof/indices len mismatch');
 
     let mut current = leaf;
     let mut i: usize = 0;
@@ -42,7 +42,7 @@ pub fn compute_merkle_root(
     proof: Span<felt252>,
     indices: Span<bool>
 ) -> felt252 {
-    assert(proof.len() == indices.len(), 'proof and indices length mismatch');
+    assert(proof.len() == indices.len(), 'proof/indices len mismatch');
 
     let mut current = leaf;
     let mut i: usize = 0;

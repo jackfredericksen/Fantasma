@@ -2,7 +2,7 @@
 // Proves: User has passed KYC verification at a specified level
 // Without revealing: Personal data, verification details
 
-use super::common::hash::{compute_commitment, compute_multi_commitment, hash_pair};
+use super::common::hash::{compute_multi_commitment, hash_pair};
 
 /// KYC verification levels
 /// 1 = Basic (identity verified)

@@ -126,4 +126,54 @@ impl ZkClaims {
         });
         self
     }
+
+    /// Add an age claim with explicit verified status
+    pub fn with_age_claim_verified(
+        mut self,
+        threshold: u8,
+        verified: bool,
+        proof_ref: Option<ProofRef>,
+    ) -> Self {
+        self.zk_age_claim = Some(ZkAgeClaim {
+            threshold,
+            verified,
+            proof_ref,
+            circuit_version: "age_verification_v1".to_string(),
+        });
+        self
+    }
+
+    /// Add a credential claim with explicit verified status
+    pub fn with_credential_claim_verified(
+        mut self,
+        credential_type: String,
+        verified: bool,
+        proof_ref: Option<ProofRef>,
+    ) -> Self {
+        self.zk_credential_claim = Some(ZkCredentialClaim {
+            credential_type,
+            verified,
+            proof_ref,
+            circuit_version: "credential_verification_v1".to_string(),
+        });
+        self
+    }
+
+    /// Add a KYC claim with explicit verified status
+    pub fn with_kyc_claim_verified(
+        mut self,
+        level: KycLevel,
+        verified: bool,
+        proof_ref: Option<ProofRef>,
+        max_age: Option<u64>,
+    ) -> Self {
+        self.zk_kyc_claim = Some(ZkKycClaim {
+            level,
+            verified,
+            proof_ref,
+            circuit_version: "kyc_verification_v1".to_string(),
+            max_age_seconds: max_age,
+        });
+        self
+    }
 }

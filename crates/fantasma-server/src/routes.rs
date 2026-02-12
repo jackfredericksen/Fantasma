@@ -46,6 +46,61 @@ pub struct AuthorizeParams {
     pub code_challenge_method: Option<String>,
 }
 
+/// Demo user data for authorization flow
+struct DemoUser {
+    id: &'static str,
+    name: &'static str,
+    dob: &'static str,
+    age_18: bool,
+    age_21: bool,
+    kyc_basic: bool,
+    kyc_enhanced: bool,
+    has_degree: bool,
+}
+
+const DEMO_USERS: &[DemoUser] = &[
+    DemoUser {
+        id: "alice",
+        name: "Alice",
+        dob: "1990",
+        age_18: true,
+        age_21: true,
+        kyc_basic: true,
+        kyc_enhanced: true,
+        has_degree: true,
+    },
+    DemoUser {
+        id: "bob",
+        name: "Bob",
+        dob: "2005",
+        age_18: true,
+        age_21: false,
+        kyc_basic: true,
+        kyc_enhanced: false,
+        has_degree: false,
+    },
+    DemoUser {
+        id: "carol",
+        name: "Carol",
+        dob: "2010",
+        age_18: false,
+        age_21: false,
+        kyc_basic: false,
+        kyc_enhanced: false,
+        has_degree: false,
+    },
+    DemoUser {
+        id: "dave",
+        name: "Dave",
+        dob: "1975",
+        age_18: true,
+        age_21: true,
+        kyc_basic: true,
+        kyc_enhanced: true,
+        has_degree: false,
+    },
+];
+
 /// Authorization endpoint - shows consent page
 pub async fn authorize(
     State(state): State<AppState>,
@@ -61,7 +116,7 @@ pub async fn authorize(
     }
 
     // Validate client and redirect URI
-    if !state.validate_redirect_uri(&params.client_id, &params.redirect_uri) {
+    if !state.validate_redirect_uri(&params.client_id, &params.redirect_uri).await {
         return Html("<h1>Error</h1><p>Invalid client or redirect URI</p>".to_string())
             .into_response();
     }
@@ -77,9 +132,13 @@ pub async fn authorize(
     let scopes = parse_scopes(&params.scope);
     let permissions_html = build_permissions_html(&scopes);
 
-    // Build allow/deny URLs
-    let query_string = build_query_string(&params);
-    let allow_url = format!("/authorize/consent?action=allow&{}", query_string);
+    // Build user options HTML
+    let user_options_html = build_user_options_html(&scopes);
+
+    // Build hidden fields for form
+    let hidden_fields_html = build_hidden_fields(&params);
+
+    // Build deny URL
     let deny_url = format!(
         "{}?error=access_denied&error_description=User%20denied%20access{}",
         params.redirect_uri,
@@ -90,10 +149,138 @@ pub async fn authorize(
     let html = AUTHORIZE_TEMPLATE
         .replace("{{CLIENT_NAME}}", &client_name)
         .replace("{{PERMISSIONS}}", &permissions_html)
-        .replace("{{ALLOW_URL}}", &allow_url)
+        .replace("{{USER_OPTIONS}}", &user_options_html)
+        .replace("{{HIDDEN_FIELDS}}", &hidden_fields_html)
         .replace("{{DENY_URL}}", &deny_url);
 
     Html(html).into_response()
+}
+
+/// Build hidden fields for the authorization form
+fn build_hidden_fields(params: &AuthorizeParams) -> String {
+    let mut html = String::new();
+
+    html.push_str(&format!(
+        r#"<input type="hidden" name="response_type" value="{}">"#,
+        html_escape(&params.response_type)
+    ));
+    html.push_str(&format!(
+        r#"<input type="hidden" name="client_id" value="{}">"#,
+        html_escape(&params.client_id)
+    ));
+    html.push_str(&format!(
+        r#"<input type="hidden" name="redirect_uri" value="{}">"#,
+        html_escape(&params.redirect_uri)
+    ));
+    html.push_str(&format!(
+        r#"<input type="hidden" name="scope" value="{}">"#,
+        html_escape(&params.scope)
+    ));
+
+    if let Some(ref state) = params.state {
+        html.push_str(&format!(
+            r#"<input type="hidden" name="state" value="{}">"#,
+            html_escape(state)
+        ));
+    }
+    if let Some(ref nonce) = params.nonce {
+        html.push_str(&format!(
+            r#"<input type="hidden" name="nonce" value="{}">"#,
+            html_escape(nonce)
+        ));
+    }
+    if let Some(ref challenge) = params.code_challenge {
+        html.push_str(&format!(
+            r#"<input type="hidden" name="code_challenge" value="{}">"#,
+            html_escape(challenge)
+        ));
+    }
+    if let Some(ref method) = params.code_challenge_method {
+        html.push_str(&format!(
+            r#"<input type="hidden" name="code_challenge_method" value="{}">"#,
+            html_escape(method)
+        ));
+    }
+
+    html
+}
+
+/// Build user options HTML with pass/fail badges based on requested scopes
+fn build_user_options_html(scopes: &[ZkScope]) -> String {
+    let mut html = String::new();
+
+    for (i, user) in DEMO_USERS.iter().enumerate() {
+        let checked = if i == 0 { "checked" } else { "" };
+
+        // Determine which badges to show based on requested scopes
+        let mut badges = Vec::new();
+
+        for scope in scopes {
+            match scope {
+                ZkScope::Age { threshold } => {
+                    let passes = if *threshold <= 18 {
+                        user.age_18
+                    } else if *threshold <= 21 {
+                        user.age_21
+                    } else {
+                        user.age_21 // assume 21+ for higher thresholds in demo
+                    };
+                    badges.push((format!("{}+", threshold), passes));
+                }
+                ZkScope::Kyc { level } => {
+                    let passes = match level {
+                        fantasma_core::claim::KycLevel::Basic => user.kyc_basic,
+                        fantasma_core::claim::KycLevel::Enhanced => user.kyc_enhanced,
+                        fantasma_core::claim::KycLevel::Accredited => user.kyc_enhanced, // treat as enhanced for demo
+                    };
+                    badges.push((format!("KYC {}", level.as_str()), passes));
+                }
+                ZkScope::Credential { credential_type } => {
+                    let cred = credential_type.as_deref().unwrap_or("credential");
+                    let passes = if cred.contains("degree") {
+                        user.has_degree
+                    } else {
+                        true // assume other credentials pass
+                    };
+                    badges.push((cred.to_string(), passes));
+                }
+                ZkScope::OpenId => {} // No badge for openid
+            }
+        }
+
+        let badges_html: String = badges
+            .iter()
+            .map(|(label, passes)| {
+                let class = if *passes { "badge-pass" } else { "badge-fail" };
+                let icon = if *passes { "✓" } else { "✗" };
+                format!(r#"<span class="user-badge {}">{} {}</span>"#, class, icon, label)
+            })
+            .collect::<Vec<_>>()
+            .join("");
+
+        html.push_str(&format!(
+            r#"<label class="user-option">
+                <input type="radio" name="demo_user" value="{}" {}>
+                <div class="user-card">
+                    <div class="user-name">{}</div>
+                    <div class="user-dob">Born {}</div>
+                    <div class="user-badges">{}</div>
+                </div>
+            </label>"#,
+            user.id, checked, user.name, user.dob, badges_html
+        ));
+    }
+
+    html
+}
+
+/// Simple HTML escape
+fn html_escape(s: &str) -> String {
+    s.replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('"', "&quot;")
+        .replace('\'', "&#x27;")
 }
 
 /// Build permissions HTML from scopes
@@ -201,14 +388,16 @@ pub struct ConsentParams {
     pub nonce: Option<String>,
     pub code_challenge: Option<String>,
     pub code_challenge_method: Option<String>,
+    /// Selected demo user for testing
+    pub demo_user: Option<String>,
 }
 
-/// Consent confirmation endpoint
+/// Consent confirmation endpoint (accepts form data via POST)
 pub async fn authorize_consent(
     State(state): State<AppState>,
-    Query(params): Query<ConsentParams>,
+    axum::Form(params): axum::Form<ConsentParams>,
 ) -> impl IntoResponse {
-    if params.action != "allow" {
+    if params.action != "approve" && params.action != "allow" {
         let mut redirect_url = format!(
             "{}?error=access_denied&error_description=User%20denied%20access",
             params.redirect_uri
@@ -219,9 +408,19 @@ pub async fn authorize_consent(
         return Redirect::temporary(&redirect_url);
     }
 
-    // Parse scopes
+    // Get demo user (default to alice)
+    let demo_user_id = params.demo_user.as_deref().unwrap_or("alice");
+    let demo_user = DEMO_USERS
+        .iter()
+        .find(|u| u.id == demo_user_id)
+        .unwrap_or(&DEMO_USERS[0]);
+
+    // Parse scopes and add demo_user prefix to track which user was selected
     let scopes = parse_scopes(&params.scope);
-    let scope_strings: Vec<String> = scopes.iter().map(|s| s.to_string()).collect();
+    let mut scope_strings: Vec<String> = scopes.iter().map(|s| s.to_string()).collect();
+
+    // Add demo user marker (will be used in token generation)
+    scope_strings.push(format!("demo_user:{}", demo_user.id));
 
     // Create authorization code
     let code = state
@@ -232,6 +431,12 @@ pub async fn authorize_consent(
             params.nonce,
         )
         .await;
+
+    tracing::info!(
+        "Authorization granted for demo user '{}' with scopes: {:?}",
+        demo_user.name,
+        params.scope
+    );
 
     let mut redirect_url = format!("{}?code={}", params.redirect_uri, code);
     if let Some(s) = params.state {
@@ -289,7 +494,26 @@ pub async fn token(
         )
     })?;
 
-    // Build ZK claims based on scopes
+    // Find demo user from scopes
+    let demo_user_id = auth_code
+        .scopes
+        .iter()
+        .find(|s| s.starts_with("demo_user:"))
+        .and_then(|s| s.strip_prefix("demo_user:"))
+        .unwrap_or("alice");
+
+    let demo_user = DEMO_USERS
+        .iter()
+        .find(|u| u.id == demo_user_id)
+        .unwrap_or(&DEMO_USERS[0]);
+
+    tracing::info!(
+        "Generating token for demo user '{}' (born {})",
+        demo_user.name,
+        demo_user.dob
+    );
+
+    // Build ZK claims based on scopes and demo user's actual credentials
     let mut zk_claims = ZkClaims::new();
 
     for scope in &auth_code.scopes {
@@ -298,7 +522,17 @@ pub async fn token(
                 .strip_prefix("zk:age:")
                 .and_then(|s| s.trim_end_matches('+').parse().ok())
                 .unwrap_or(18);
-            zk_claims = zk_claims.with_age_claim(threshold, None);
+
+            // Check if demo user passes the age requirement
+            let verified = if threshold <= 18 {
+                demo_user.age_18
+            } else if threshold <= 21 {
+                demo_user.age_21
+            } else {
+                demo_user.age_21 // Assume 21+ covers higher thresholds
+            };
+
+            zk_claims = zk_claims.with_age_claim_verified(threshold, verified, None);
         } else if scope.starts_with("zk:kyc:") {
             let level = match scope.as_str() {
                 "zk:kyc:basic" => fantasma_core::claim::KycLevel::Basic,
@@ -306,13 +540,29 @@ pub async fn token(
                 "zk:kyc:accredited" => fantasma_core::claim::KycLevel::Accredited,
                 _ => fantasma_core::claim::KycLevel::Basic,
             };
-            zk_claims = zk_claims.with_kyc_claim(level, None, None);
-        } else if scope.starts_with("zk:credential") {
+
+            // Check if demo user passes the KYC requirement
+            let verified = match level {
+                fantasma_core::claim::KycLevel::Basic => demo_user.kyc_basic,
+                fantasma_core::claim::KycLevel::Enhanced => demo_user.kyc_enhanced,
+                fantasma_core::claim::KycLevel::Accredited => demo_user.kyc_enhanced,
+            };
+
+            zk_claims = zk_claims.with_kyc_claim_verified(level, verified, None, None);
+        } else if scope.starts_with("zk:credential:") {
             let cred_type = scope
                 .strip_prefix("zk:credential:")
                 .unwrap_or("*")
                 .to_string();
-            zk_claims = zk_claims.with_credential_claim(cred_type, None);
+
+            // Check if demo user has the credential
+            let verified = if cred_type.contains("degree") {
+                demo_user.has_degree
+            } else {
+                true // Assume other credentials pass
+            };
+
+            zk_claims = zk_claims.with_credential_claim_verified(cred_type, verified, None);
         }
     }
 

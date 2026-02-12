@@ -25,7 +25,7 @@
             background: rgba(255, 255, 255, 0.95);
             border-radius: 16px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            max-width: 480px;
+            max-width: 520px;
             width: 100%;
             overflow: hidden;
         }
@@ -76,13 +76,96 @@
             color: #6b7280;
         }
 
-        .permissions-title {
+        .section-title {
             font-size: 14px;
             font-weight: 600;
             color: #374151;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-bottom: 16px;
+        }
+
+        /* User Selector Styles */
+        .user-selector {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .user-option {
+            position: relative;
+        }
+
+        .user-option input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .user-card {
+            display: block;
+            padding: 16px;
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-option input:checked + .user-card {
+            border-color: #667eea;
+            background: #f0f0ff;
+        }
+
+        .user-option input:focus + .user-card {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
+        }
+
+        .user-card:hover {
+            border-color: #667eea;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .user-dob {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .user-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .user-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .badge-pass {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-fail {
+            background: #fee2e2;
+            color: #991b1b;
         }
 
         .permission-list {
@@ -179,6 +262,16 @@
             line-height: 1.5;
         }
 
+        .demo-notice {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            color: #92400e;
+        }
+
         .buttons {
             display: flex;
             gap: 12px;
@@ -244,26 +337,53 @@
                 <div class="client-domain">wants to verify your identity</div>
             </div>
 
-            <div class="permissions-title">This will prove:</div>
-
-            <ul class="permission-list">
-                {{PERMISSIONS}}
-            </ul>
-
-            <div class="privacy-notice">
-                <span class="privacy-notice-icon">&#9989;</span>
-                <p><strong>Privacy Protected:</strong> Only the verification result is shared. Your actual data (birthdate, documents, personal info) stays private.</p>
+            <div class="demo-notice">
+                <strong>Demo Mode:</strong> Select a test user below to simulate different verification scenarios.
             </div>
 
-            <div class="buttons">
-                <a href="{{DENY_URL}}" class="btn btn-deny">Deny</a>
-                <a href="{{ALLOW_URL}}" class="btn btn-allow">Allow</a>
-            </div>
+            <form id="authForm" action="/authorize/consent" method="get">
+                <input type="hidden" name="action" value="allow">
+                {{HIDDEN_FIELDS}}
+
+                <div class="user-selector">
+                    <div class="section-title">Select Test User</div>
+                    <div class="user-grid">
+                        {{USER_OPTIONS}}
+                    </div>
+                </div>
+
+                <div class="section-title">This will prove:</div>
+
+                <ul class="permission-list">
+                    {{PERMISSIONS}}
+                </ul>
+
+                <div class="privacy-notice">
+                    <span class="privacy-notice-icon">&#9989;</span>
+                    <p><strong>Privacy Protected:</strong> Only the verification result is shared. Your actual data (birthdate, documents, personal info) stays private.</p>
+                </div>
+
+                <div class="buttons">
+                    <a href="{{DENY_URL}}" class="btn btn-deny">Deny</a>
+                    <button type="submit" class="btn btn-allow">Authorize</button>
+                </div>
+            </form>
         </div>
 
         <div class="footer">
             Powered by <a href="#">Fantasma</a> &middot; Post-Quantum Secure
         </div>
     </div>
+
+    <script>
+        // Update badges based on selected user and requested scopes
+        document.querySelectorAll('input[name="demo_user"]').forEach(radio => {
+            radio.addEventListener('change', updateBadges);
+        });
+
+        function updateBadges() {
+            // Badge colors are pre-computed server-side for demo
+        }
+    </script>
 </body>
 </html>

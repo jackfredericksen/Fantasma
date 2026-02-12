@@ -1,17 +1,13 @@
 [package]
-name = "fantasma-server"
-description = "HTTP server for Fantasma OIDC provider"
+name = "fantasma-cli"
+description = "Command-line interface for Fantasma identity provider"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
 
-[lib]
-name = "fantasma_server"
-path = "src/lib.rs"
-
 [[bin]]
-name = "fantasma-server"
+name = "fantasma"
 path = "src/main.rs"
 
 [dependencies]
@@ -20,25 +16,17 @@ fantasma-crypto = { workspace = true }
 fantasma-stark = { workspace = true }
 fantasma-oidc = { workspace = true }
 fantasma-proof-store = { workspace = true }
-fantasma-db = { workspace = true }
 tokio = { workspace = true }
-axum = { workspace = true }
-tower = { workspace = true }
-tower-http = { workspace = true }
+clap = { version = "4.4", features = ["derive", "env"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
-config = { workspace = true }
-dotenvy = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
-thiserror = { workspace = true }
 anyhow = { workspace = true }
-uuid = { workspace = true }
-chrono = { workspace = true }
-rand = { workspace = true }
 base64 = { workspace = true }
 hex = { workspace = true }
-url = { workspace = true }
-
-[dev-dependencies]
-tower = { workspace = true, features = ["util"] }
+chrono = { workspace = true }
+uuid = { workspace = true }
+dialoguer = "0.11"
+console = "0.15"
+indicatif = "0.17"

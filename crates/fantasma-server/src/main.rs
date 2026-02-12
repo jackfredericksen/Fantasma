@@ -2,24 +2,18 @@
 //!
 //! HTTP server for the Fantasma OIDC provider.
 
-use axum::{routing::{get, post}, Router};
+use fantasma_db::pool::DatabasePool;
 use fantasma_oidc::config::OidcConfig;
-use tower_http::cors::{Any, CorsLayer};
-use tower_http::trace::TraceLayer;
+use fantasma_server::{create_router, state::AppState};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-
-mod routes;
-mod seeds;
-mod state;
-
-use state::AppState;
 
 #[tokio::main]
 async fn main() {
     // Initialize tracing
     tracing_subscriber::registry()
         .with(tracing_subscriber::EnvFilter::new(
-            std::env::var("RUST_LOG").unwrap_or_else(|_| "fantasma_server=debug,tower_http=debug".into()),
+            std::env::var("RUST_LOG")
+                .unwrap_or_else(|_| "fantasma_server=debug,tower_http=debug".into()),
         ))
         .with(tracing_subscriber::fmt::layer())
         .init();
@@ -29,34 +23,51 @@ async fn main() {
         std::env::var("FANTASMA_ISSUER").unwrap_or_else(|_| "http://localhost:3000".to_string()),
     );
 
-    // Create application state
-    let state = AppState::new(config);
+    // Try to connect to database if DATABASE_URL is set
+    let db = match std::env::var("DATABASE_URL") {
+        Ok(url) if !url.is_empty() => {
+            tracing::info!("DATABASE_URL set, connecting to PostgreSQL...");
+            match DatabasePool::from_env().await {
+                Ok(pool) => {
+                    tracing::info!("Database connection established");
 
-    // Build router
-    let app = Router::new()
-        // OIDC Discovery
-        .route("/.well-known/openid-configuration", get(routes::discovery))
-        .route("/.well-known/jwks.json", get(routes::jwks))
-        // OIDC Core
-        .route("/authorize", get(routes::authorize))
-        .route("/authorize/consent", get(routes::authorize_consent))
-        .route("/token", post(routes::token))
-        .route("/userinfo", get(routes::userinfo))
-        // ZK Proof endpoints
-        .route("/proofs", post(routes::submit_proof))
-        .route("/proofs/:id", get(routes::get_proof))
-        // Health check
-        .route("/health", get(routes::health))
-        // Demo/seed data endpoints
-        .route("/demo/users", get(routes::demo_users))
-        .route("/demo/seeds", get(routes::seeds))
-        .with_state(state)
-        .layer(CorsLayer::new().allow_origin(Any).allow_methods(Any).allow_headers(Any))
-        .layer(TraceLayer::new_for_http());
+                    // Run migrations
+                    if let Err(e) = pool.run_migrations().await {
+                        tracing::warn!("Failed to run migrations: {}. Continuing anyway.", e);
+                    }
+
+                    Some(pool)
+                }
+                Err(e) => {
+                    tracing::warn!(
+                        "Failed to connect to database: {}. Falling back to in-memory storage.",
+                        e
+                    );
+                    None
+                }
+            }
+        }
+        _ => {
+            tracing::info!("DATABASE_URL not set, using in-memory storage");
+            None
+        }
+    };
+
+    // Create application state
+    let state = AppState::with_storage(config, db);
+
+    // Log storage mode
+    if state.is_using_database() {
+        tracing::info!("Running with PostgreSQL persistence");
+    } else {
+        tracing::info!("Running with in-memory storage (data will be lost on restart)");
+    }
+
+    // Build router using the library function
+    let app = create_router(state);
 
     // Start server
-    let addr = std::env::var("FANTASMA_BIND")
-        .unwrap_or_else(|_| "0.0.0.0:3000".to_string());
+    let addr = std::env::var("FANTASMA_BIND").unwrap_or_else(|_| "0.0.0.0:3000".to_string());
 
     tracing::info!("Starting Fantasma server on {}", addr);
 

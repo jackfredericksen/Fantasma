@@ -6,13 +6,13 @@
 //! Run with: cargo run --example relying_party
 
 use fantasma_client_sdk::{AuthorizationUrlBuilder, FantasmaClient};
-use fantasma_core::claim::KycLevel;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 const FANTASMA_ISSUER: &str = "http://localhost:3000";
 const CLIENT_ID: &str = "demo-client";
 const REDIRECT_URI: &str = "http://localhost:8080/callback";
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct IdTokenClaims {
     sub: String,

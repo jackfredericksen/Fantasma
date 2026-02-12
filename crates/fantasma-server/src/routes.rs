@@ -345,6 +345,7 @@ fn build_permissions_html(scopes: &[ZkScope]) -> String {
 }
 
 /// Build query string from params
+#[allow(dead_code)]
 fn build_query_string(params: &AuthorizeParams) -> String {
     let mut parts = vec![
         format!("response_type={}", urlencoding::encode(&params.response_type)),
@@ -370,6 +371,7 @@ fn build_query_string(params: &AuthorizeParams) -> String {
 }
 
 /// URL encoding helper
+#[allow(dead_code)]
 mod urlencoding {
     pub fn encode(s: &str) -> String {
         url::form_urlencoded::byte_serialize(s.as_bytes()).collect()

@@ -89,14 +89,14 @@ pub trait ProofStore: Send + Sync {
 /// In-memory proof store (for development/testing)
 pub struct InMemoryProofStore {
     proofs: RwLock<HashMap<String, StoredProof>>,
-    default_ttl: i64,
+    _default_ttl: i64,
 }
 
 impl InMemoryProofStore {
     pub fn new(default_ttl_seconds: i64) -> Self {
         Self {
             proofs: RwLock::new(HashMap::new()),
-            default_ttl: default_ttl_seconds,
+            _default_ttl: default_ttl_seconds,
         }
     }
 }

@@ -57,7 +57,7 @@ pub struct Prover {
 
 /// Compiled circuit (placeholder for actual Cairo compilation)
 struct CompiledCircuit {
-    circuit_type: CircuitType,
+    _circuit_type: CircuitType,
     _bytecode: Vec<u8>,
 }
 
@@ -77,7 +77,7 @@ impl Prover {
         //
         // For now, we create a placeholder
         let circuit = CompiledCircuit {
-            circuit_type,
+            _circuit_type: circuit_type,
             _bytecode: Vec::new(),
         };
         self.circuits.insert(circuit_type, circuit);
@@ -160,7 +160,7 @@ fn generate_mock_proof(witness: &Witness) -> Vec<u8> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::witness::{AgeVerificationWitnessBuilder, WitnessValue};
+    use crate::witness::AgeVerificationWitnessBuilder;
 
     #[tokio::test]
     async fn test_prove_age() {

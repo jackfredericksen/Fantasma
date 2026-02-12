@@ -2,7 +2,7 @@
 //!
 //! Credential issuance service.
 
-use chrono::{DateTime, NaiveDate, Utc};
+use chrono::{NaiveDate, Utc};
 use fantasma_core::claim::KycLevel;
 use fantasma_core::credential::{
     Credential, CredentialId, CredentialType, IssuerSignature, SchemaId, SignatureAlgorithm,

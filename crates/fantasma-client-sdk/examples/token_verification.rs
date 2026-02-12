@@ -6,9 +6,10 @@
 //! Run with: cargo run --example token_verification
 
 use base64::Engine;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 /// ID Token Claims structure
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct IdTokenClaims {
     // Standard OIDC claims
@@ -25,6 +26,7 @@ struct IdTokenClaims {
     zk_credential_claim: Option<ZkCredentialClaim>,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct ZkAgeClaim {
     verified: bool,
@@ -33,6 +35,7 @@ struct ZkAgeClaim {
     circuit_version: Option<String>,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct ZkKycClaim {
     verified: bool,
@@ -41,6 +44,7 @@ struct ZkKycClaim {
     max_age: Option<u64>,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct ZkCredentialClaim {
     verified: bool,
@@ -48,6 +52,7 @@ struct ZkCredentialClaim {
     proof_ref: Option<ProofRef>,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct ProofRef {
     id: String,

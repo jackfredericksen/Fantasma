@@ -5,7 +5,7 @@ use axum::{
     extract::ConnectInfo,
     http::{header, Request, StatusCode},
     middleware::Next,
-    response::{IntoResponse, Response},
+    response::Response,
 };
 use std::{
     collections::HashMap,
@@ -113,8 +113,8 @@ pub async fn rate_limit_middleware(
     // Get rate limiter from extensions (would be set up in router)
     // For now, we'll use a simple per-IP approach
 
-    // Extract client identifier (IP address)
-    let client_id = addr.ip().to_string();
+    // Extract client identifier (IP address) - will be used for rate limiting
+    let _client_id = addr.ip().to_string();
 
     // In production, you would:
     // 1. Check against a shared rate limiter

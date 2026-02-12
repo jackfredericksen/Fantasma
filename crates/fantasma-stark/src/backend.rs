@@ -273,7 +273,7 @@ impl ProverBackendTrait for MockBackend {
 pub struct StoneBackend {
     prover_path: PathBuf,
     verifier_path: Option<PathBuf>,
-    num_threads: usize,
+    _num_threads: usize,
 }
 
 impl StoneBackend {
@@ -288,7 +288,7 @@ impl StoneBackend {
         Ok(Self {
             prover_path,
             verifier_path: None,
-            num_threads: num_cpus::get(),
+            _num_threads: num_cpus::get(),
         })
     }
 

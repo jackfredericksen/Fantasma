@@ -1,8 +1,8 @@
 //! Proof generation and verification commands
 
-use anyhow::{bail, Result};
+use anyhow::Result;
 use console::style;
-use fantasma_stark::{MockBackend, ProofResult, ProverBackendTrait};
+use fantasma_stark::{MockBackend, ProverBackendTrait};
 use indicatif::{ProgressBar, ProgressStyle};
 use std::fs;
 use std::time::Duration;

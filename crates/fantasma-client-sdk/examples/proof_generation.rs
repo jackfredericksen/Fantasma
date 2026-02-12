@@ -5,7 +5,7 @@
 //!
 //! Run with: cargo run --example proof_generation
 
-use fantasma_stark::{MockBackend, ProverBackendTrait, ProverConfig};
+use fantasma_stark::{MockBackend, ProverBackendTrait};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

@@ -4,7 +4,6 @@
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use console::style;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod commands;

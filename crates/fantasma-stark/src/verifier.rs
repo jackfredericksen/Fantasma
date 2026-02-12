@@ -47,7 +47,7 @@ pub struct Verifier {
 
 /// Verification key for a circuit (placeholder)
 struct VerificationKey {
-    circuit_type: CircuitType,
+    _circuit_type: CircuitType,
     _key_bytes: Vec<u8>,
 }
 
@@ -63,7 +63,7 @@ impl Verifier {
     pub fn load_verification_key(&mut self, circuit_type: CircuitType) -> Result<(), VerifierError> {
         // In a real implementation, this would load the actual verification key
         let vk = VerificationKey {
-            circuit_type,
+            _circuit_type: circuit_type,
             _key_bytes: Vec::new(),
         };
         self.verification_keys.insert(circuit_type, vk);

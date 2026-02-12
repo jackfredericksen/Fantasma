@@ -4,7 +4,6 @@
 
 use fantasma_core::proof::ProofRef;
 use fantasma_oidc::claims::{ZkAgeClaim, ZkCredentialClaim, ZkKycClaim};
-use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 #[derive(Error, Debug)]

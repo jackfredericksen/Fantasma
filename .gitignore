@@ -1,6 +1,8 @@
 # Rust
 target/
 Cargo.lock
+.gitignore
+Cargo.lock
 
 # Node
 node_modules/

@@ -1,5 +1,8 @@
 //! Repository implementations for database operations
 
+use async_trait::async_trait;
+use fantasma_core::proof::ProofId;
+use fantasma_proof_store::{ProofStore, ProofStoreError, StoredProof as ProofStoreProof};
 use sqlx::PgPool;
 
 use crate::models::*;
@@ -52,6 +55,39 @@ impl ClientRepo {
             .await?;
 
         Ok(results)
+    }
+
+    pub async fn list_paginated(&self, limit: i64, offset: i64) -> Result<Vec<Client>> {
+        let results = sqlx::query_as::<_, Client>(
+            "SELECT * FROM clients ORDER BY created_at DESC LIMIT $1 OFFSET $2",
+        )
+        .bind(limit)
+        .bind(offset)
+        .fetch_all(&self.pool)
+        .await?;
+
+        Ok(results)
+    }
+
+    pub async fn count(&self) -> Result<i64> {
+        let result = sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM clients")
+            .fetch_one(&self.pool)
+            .await?;
+
+        Ok(result)
+    }
+
+    pub async fn delete(&self, client_id: &str) -> Result<()> {
+        let result = sqlx::query("DELETE FROM clients WHERE client_id = $1")
+            .bind(client_id)
+            .execute(&self.pool)
+            .await?;
+
+        if result.rows_affected() == 0 {
+            return Err(DbError::NotFound(format!("Client not found: {}", client_id)));
+        }
+
+        Ok(())
     }
 }
 
@@ -200,6 +236,131 @@ impl ProofRepo {
             .await?;
 
         Ok(result.rows_affected())
+    }
+
+    pub async fn list_paginated(
+        &self,
+        limit: i64,
+        offset: i64,
+        circuit_type: Option<&str>,
+    ) -> Result<Vec<StoredProof>> {
+        let results = match circuit_type {
+            Some(ct) => {
+                sqlx::query_as::<_, StoredProof>(
+                    "SELECT * FROM proofs WHERE circuit_type = $3 ORDER BY created_at DESC LIMIT $1 OFFSET $2",
+                )
+                .bind(limit)
+                .bind(offset)
+                .bind(ct)
+                .fetch_all(&self.pool)
+                .await?
+            }
+            None => {
+                sqlx::query_as::<_, StoredProof>(
+                    "SELECT * FROM proofs ORDER BY created_at DESC LIMIT $1 OFFSET $2",
+                )
+                .bind(limit)
+                .bind(offset)
+                .fetch_all(&self.pool)
+                .await?
+            }
+        };
+
+        Ok(results)
+    }
+
+    pub async fn count(&self) -> Result<i64> {
+        let result = sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM proofs")
+            .fetch_one(&self.pool)
+            .await?;
+
+        Ok(result)
+    }
+
+    pub async fn delete(&self, proof_id: &str) -> Result<()> {
+        sqlx::query("DELETE FROM proofs WHERE proof_id = $1")
+            .bind(proof_id)
+            .execute(&self.pool)
+            .await?;
+
+        Ok(())
+    }
+}
+
+/// PostgreSQL-backed proof store implementing the ProofStore trait
+pub struct PostgresProofStore {
+    pool: PgPool,
+}
+
+impl PostgresProofStore {
+    pub fn new(pool: PgPool) -> Self {
+        Self { pool }
+    }
+}
+
+#[async_trait]
+impl ProofStore for PostgresProofStore {
+    async fn store(&self, proof: ProofStoreProof) -> std::result::Result<ProofId, ProofStoreError> {
+        let repo = ProofRepo::new(self.pool.clone());
+        let new_proof = NewProof {
+            proof_id: proof.id.0.clone(),
+            proof_hash: proof.hash.to_vec(),
+            proof_data: proof.proof_bytes.clone(),
+            circuit_type: proof.circuit_type.clone(),
+            public_inputs: serde_json::json!({}),
+            verified: false,
+            user_id: None,
+            expires_at: Some(proof.expires_at),
+        };
+
+        repo.create(new_proof)
+            .await
+            .map(|_| proof.id)
+            .map_err(|e| ProofStoreError::Storage(e.to_string()))
+    }
+
+    async fn get(&self, id: &ProofId) -> std::result::Result<ProofStoreProof, ProofStoreError> {
+        let repo = ProofRepo::new(self.pool.clone());
+        let stored = repo
+            .find_by_proof_id(&id.0)
+            .await
+            .map_err(|e| ProofStoreError::Storage(e.to_string()))?
+            .ok_or_else(|| ProofStoreError::NotFound(id.0.clone()))?;
+
+        if let Some(expires_at) = stored.expires_at {
+            if chrono::Utc::now() > expires_at {
+                return Err(ProofStoreError::Expired);
+            }
+        }
+
+        let mut hash = [0u8; 32];
+        if stored.proof_hash.len() == 32 {
+            hash.copy_from_slice(&stored.proof_hash);
+        }
+
+        Ok(ProofStoreProof {
+            id: ProofId::new(stored.proof_id),
+            proof_bytes: stored.proof_data,
+            hash,
+            circuit_type: stored.circuit_type,
+            stored_at: stored.created_at,
+            expires_at: stored.expires_at.unwrap_or(stored.created_at + chrono::Duration::hours(1)),
+        })
+    }
+
+    async fn delete(&self, id: &ProofId) -> std::result::Result<(), ProofStoreError> {
+        let repo = ProofRepo::new(self.pool.clone());
+        repo.delete(&id.0)
+            .await
+            .map_err(|e| ProofStoreError::Storage(e.to_string()))
+    }
+
+    async fn cleanup_expired(&self) -> std::result::Result<usize, ProofStoreError> {
+        let repo = ProofRepo::new(self.pool.clone());
+        repo.cleanup_expired()
+            .await
+            .map(|n| n as usize)
+            .map_err(|e| ProofStoreError::Storage(e.to_string()))
     }
 }
 
@@ -389,6 +550,33 @@ impl IssuerRepo {
 
         Ok(())
     }
+
+    pub async fn list_all(&self) -> Result<Vec<Issuer>> {
+        let results = sqlx::query_as::<_, Issuer>(
+            "SELECT * FROM issuers ORDER BY name",
+        )
+        .fetch_all(&self.pool)
+        .await?;
+
+        Ok(results)
+    }
+
+    pub async fn delete(&self, issuer_id: &str) -> Result<()> {
+        sqlx::query("DELETE FROM issuers WHERE issuer_id = $1")
+            .bind(issuer_id)
+            .execute(&self.pool)
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn count(&self) -> Result<i64> {
+        let result = sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM issuers")
+            .fetch_one(&self.pool)
+            .await?;
+
+        Ok(result)
+    }
 }
 
 /// Repository for audit logs
@@ -431,6 +619,26 @@ impl AuditLogRepo {
         .await?;
 
         Ok(results)
+    }
+
+    pub async fn list_recent(&self, limit: i64, offset: i64) -> Result<Vec<AuditLogEntry>> {
+        let results = sqlx::query_as::<_, AuditLogEntry>(
+            "SELECT * FROM audit_log ORDER BY created_at DESC LIMIT $1 OFFSET $2",
+        )
+        .bind(limit)
+        .bind(offset)
+        .fetch_all(&self.pool)
+        .await?;
+
+        Ok(results)
+    }
+
+    pub async fn count(&self) -> Result<i64> {
+        let result = sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM audit_log")
+            .fetch_one(&self.pool)
+            .await?;
+
+        Ok(result)
     }
 }
 

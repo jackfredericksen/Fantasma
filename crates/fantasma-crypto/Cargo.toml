@@ -19,3 +19,6 @@ serde = { workspace = true }
 hex = { workspace = true }
 thiserror = { workspace = true }
 zeroize = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.10"

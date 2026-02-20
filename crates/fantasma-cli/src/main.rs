@@ -51,8 +51,38 @@ enum Commands {
         action: CredentialAction,
     },
 
+    /// Database management
+    Db {
+        #[command(subcommand)]
+        action: DbAction,
+    },
+
     /// Show configuration and status
     Status,
+}
+
+#[derive(Subcommand)]
+enum DbAction {
+    /// Run database migrations
+    Migrate {
+        /// Database URL
+        #[arg(long, env = "DATABASE_URL")]
+        database_url: Option<String>,
+    },
+
+    /// Show database status and table counts
+    Status {
+        /// Database URL
+        #[arg(long, env = "DATABASE_URL")]
+        database_url: Option<String>,
+    },
+
+    /// Seed the database with demo data
+    Seed {
+        /// Database URL
+        #[arg(long, env = "DATABASE_URL")]
+        database_url: Option<String>,
+    },
 }
 
 #[derive(Subcommand)]
@@ -203,6 +233,17 @@ async fn main() -> Result<()> {
             }
             CredentialAction::Import { file } => {
                 commands::credential::import(&file).await?;
+            }
+        },
+        Commands::Db { action } => match action {
+            DbAction::Migrate { database_url } => {
+                commands::db::migrate(database_url).await?;
+            }
+            DbAction::Status { database_url } => {
+                commands::db::status(database_url).await?;
+            }
+            DbAction::Seed { database_url } => {
+                commands::db::seed(database_url).await?;
             }
         },
         Commands::Status => {

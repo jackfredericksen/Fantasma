@@ -18,3 +18,4 @@ tokio = { workspace = true }
 tracing = { workspace = true }
 chrono = { workspace = true }
 num_cpus = "1.16"
+tempfile = "3.10"

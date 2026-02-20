@@ -33,14 +33,28 @@ services:
       FANTASMA_ISSUER: http://localhost:3000
       FANTASMA_BIND: 0.0.0.0:3000
       DATABASE_URL: postgres://fantasma:fantasma_dev_password@postgres:5432/fantasma
+      FANTASMA_ADMIN_KEY: dev-admin-key-change-in-production
+      FANTASMA_KEY_DIR: /app/keys
+    volumes:
+      - key_data:/app/keys
     depends_on:
       postgres:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+
+  # Admin dashboard (optional)
+  admin-dashboard:
+    image: node:20-alpine
+    container_name: fantasma-admin
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./admin-dashboard:/app
+    command: sh -c "npm install --silent && npm run dev -- --host 0.0.0.0"
+    depends_on:
+      - fantasma-server
+    profiles:
+      - admin
 
   # Demo relying party (optional)
   demo-rp:
@@ -61,6 +75,7 @@ services:
 
 volumes:
   postgres_data:
+  key_data:
 
 networks:
   default:

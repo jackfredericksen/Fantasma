@@ -7,6 +7,7 @@ pub mod backend;
 pub mod cairo_runner;
 pub mod circuit;
 pub mod prover;
+pub mod stone_config;
 pub mod verifier;
 pub mod witness;
 

@@ -12,8 +12,8 @@ pub mod repos;
 pub mod pool;
 
 pub use models::*;
-pub use repos::*;
 pub use pool::DatabasePool;
+pub use repos::*;
 
 use thiserror::Error;
 

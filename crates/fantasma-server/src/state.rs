@@ -3,9 +3,10 @@
 use fantasma_db::{
     models::{NewAuthCode, NewClient},
     pool::{DatabasePool, Repositories},
+    PostgresProofStore,
 };
 use fantasma_oidc::config::OidcConfig;
-use fantasma_proof_store::InMemoryProofStore;
+use fantasma_proof_store::{InMemoryProofStore, ProofStore};
 use fantasma_stark::circuit::CircuitType;
 use fantasma_stark::verifier::Verifier;
 use std::collections::HashMap;
@@ -56,8 +57,8 @@ pub struct AppState {
     /// Proof verifier
     pub verifier: Arc<Verifier>,
 
-    /// Proof storage
-    pub proof_store: Arc<InMemoryProofStore>,
+    /// Proof storage (InMemoryProofStore or PostgresProofStore)
+    pub proof_store: Arc<dyn ProofStore>,
 
     /// Storage backend
     storage: StorageBackend,
@@ -74,10 +75,37 @@ impl AppState {
 
     /// Create new state with optional database
     pub fn with_storage(config: OidcConfig, db: Option<DatabasePool>) -> Self {
-        // Generate a random signing key (in production, load from secure storage)
-        use rand::RngCore;
-        let mut signing_key = [0u8; 32];
-        rand::thread_rng().fill_bytes(&mut signing_key);
+        // Load or generate signing key
+        let signing_key = match std::env::var("FANTASMA_KEY_DIR") {
+            Ok(dir) if !dir.is_empty() => {
+                let passphrase = std::env::var("FANTASMA_KEY_PASSPHRASE")
+                    .unwrap_or_else(|_| "fantasma-dev-passphrase".into());
+                match fantasma_crypto::KeyStore::new(&dir) {
+                    Ok(store) => match store.load_or_generate(&passphrase) {
+                        Ok(kp) => {
+                            tracing::info!(
+                                "Loaded Dilithium signing key from {} (pubkey hash: {})",
+                                dir,
+                                hex::encode(&kp.public_key.hash()[..8])
+                            );
+                            kp.public_key.hash()
+                        }
+                        Err(e) => {
+                            tracing::warn!("Failed to load key store: {}. Using random key.", e);
+                            random_signing_key()
+                        }
+                    },
+                    Err(e) => {
+                        tracing::warn!("Failed to open key store dir: {}. Using random key.", e);
+                        random_signing_key()
+                    }
+                }
+            }
+            _ => {
+                tracing::info!("FANTASMA_KEY_DIR not set, using ephemeral signing key");
+                random_signing_key()
+            }
+        };
 
         // Create verifier and load circuit verification keys
         let mut verifier = Verifier::new();
@@ -88,16 +116,21 @@ impl AppState {
         // Register demo clients
         let demo_clients = create_demo_clients();
 
-        let storage = match db {
+        let (storage, proof_store): (StorageBackend, Arc<dyn ProofStore>) = match db {
             Some(pool) => {
                 tracing::info!("Using PostgreSQL storage backend");
-                StorageBackend::Database { pool }
+                let ps = Arc::new(PostgresProofStore::new(pool.get_pool()));
+                (StorageBackend::Database { pool }, ps)
             }
             None => {
                 tracing::info!("Using in-memory storage backend");
-                StorageBackend::InMemory {
-                    auth_codes: Arc::new(RwLock::new(HashMap::new())),
-                }
+                let ps = Arc::new(InMemoryProofStore::default());
+                (
+                    StorageBackend::InMemory {
+                        auth_codes: Arc::new(RwLock::new(HashMap::new())),
+                    },
+                    ps,
+                )
             }
         };
 
@@ -105,7 +138,7 @@ impl AppState {
             config: Arc::new(config),
             signing_key: Arc::new(signing_key),
             verifier: Arc::new(verifier),
-            proof_store: Arc::new(InMemoryProofStore::default()),
+            proof_store,
             storage,
             clients: Arc::new(demo_clients),
         }
@@ -284,6 +317,14 @@ impl AppState {
             }
         }
     }
+}
+
+/// Generate a random 32-byte signing key (ephemeral, lost on restart)
+fn random_signing_key() -> [u8; 32] {
+    use rand::RngCore;
+    let mut key = [0u8; 32];
+    rand::thread_rng().fill_bytes(&mut key);
+    key
 }
 
 /// Create demo clients for testing

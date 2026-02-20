@@ -5,10 +5,12 @@
 
 pub mod dilithium;
 pub mod hash;
+pub mod keystore;
 pub mod merkle;
 pub mod nullifier;
 
 pub use dilithium::{DilithiumKeypair, DilithiumPublicKey, DilithiumSignature};
 pub use hash::{poseidon_hash, poseidon_hash_pair, sha3_256};
+pub use keystore::KeyStore;
 pub use merkle::{MerkleProof, MerkleTree};
 pub use nullifier::Nullifier;

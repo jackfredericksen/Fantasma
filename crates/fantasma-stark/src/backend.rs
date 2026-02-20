@@ -296,13 +296,70 @@ impl StoneBackend {
         self.verifier_path = Some(verifier_path);
         self
     }
+
+    /// Write Stone prover config to a temp file
+    fn write_prover_config(
+        &self,
+        dir: &std::path::Path,
+    ) -> Result<PathBuf, BackendError> {
+        let config = crate::stone_config::StoneProverConfig::default();
+        let config_path = dir.join("prover_config.json");
+        let config_json = serde_json::to_string_pretty(&config)
+            .map_err(|e| BackendError::ProofFailed(format!("Config serialization: {}", e)))?;
+        std::fs::write(&config_path, config_json)?;
+        Ok(config_path)
+    }
+
+    /// Write Stone prover parameters to a temp file
+    fn write_prover_params(
+        &self,
+        dir: &std::path::Path,
+    ) -> Result<PathBuf, BackendError> {
+        let params = crate::stone_config::StoneProverParameters::default();
+        let params_path = dir.join("prover_params.json");
+        let params_json = serde_json::to_string_pretty(&params)
+            .map_err(|e| BackendError::ProofFailed(format!("Params serialization: {}", e)))?;
+        std::fs::write(&params_path, params_json)?;
+        Ok(params_path)
+    }
+
+    /// Write inputs to Stone's expected JSON format
+    fn write_inputs(
+        &self,
+        dir: &std::path::Path,
+        private_inputs: &[String],
+        public_inputs: &[String],
+    ) -> Result<(PathBuf, PathBuf), BackendError> {
+        let private_path = dir.join("private_input.json");
+        let public_path = dir.join("public_input.json");
+
+        let private_json = serde_json::json!({
+            "inputs": private_inputs,
+        });
+        let public_json = serde_json::json!({
+            "inputs": public_inputs,
+        });
+
+        std::fs::write(
+            &private_path,
+            serde_json::to_string_pretty(&private_json)
+                .map_err(|e| BackendError::ProofFailed(e.to_string()))?,
+        )?;
+        std::fs::write(
+            &public_path,
+            serde_json::to_string_pretty(&public_json)
+                .map_err(|e| BackendError::ProofFailed(e.to_string()))?,
+        )?;
+
+        Ok((private_path, public_path))
+    }
 }
 
 impl ProverBackendTrait for StoneBackend {
     fn prove(
         &self,
         circuit_type: &str,
-        _private_inputs: &[String],
+        private_inputs: &[String],
         public_inputs: &[String],
     ) -> Result<ProofResult, BackendError> {
         use std::process::Command;
@@ -310,22 +367,66 @@ impl ProverBackendTrait for StoneBackend {
 
         let start = Instant::now();
 
-        // In production, this would:
-        // 1. Write inputs to AIR input file
-        // 2. Call stone-prover with: cpu_air_prover --out_file=proof.json ...
-        // 3. Read and return the proof
+        // Create temp directory for all Stone I/O files
+        let work_dir = tempfile::tempdir()
+            .map_err(|e| BackendError::ProofFailed(format!("Failed to create temp dir: {}", e)))?;
 
-        let _output = Command::new(&self.prover_path)
-            .arg("--help") // Placeholder
+        let work_path = work_dir.path();
+        let proof_output = work_path.join("proof.json");
+
+        // Write config files
+        let config_path = self.write_prover_config(work_path)?;
+        let params_path = self.write_prover_params(work_path)?;
+        let (private_path, public_path) =
+            self.write_inputs(work_path, private_inputs, public_inputs)?;
+
+        tracing::info!(
+            "Invoking Stone prover for circuit '{}' at {}",
+            circuit_type,
+            self.prover_path.display()
+        );
+
+        // Invoke cpu_air_prover
+        let output = Command::new(&self.prover_path)
+            .arg("--out_file")
+            .arg(&proof_output)
+            .arg("--private_input_file")
+            .arg(&private_path)
+            .arg("--public_input_file")
+            .arg(&public_path)
+            .arg("--prover_config_file")
+            .arg(&config_path)
+            .arg("--parameter_file")
+            .arg(&params_path)
             .output()
-            .map_err(|e| BackendError::ProofFailed(e.to_string()))?;
+            .map_err(|e| BackendError::ProofFailed(format!("Failed to execute prover: {}", e)))?;
 
-        // For now, return mock since full integration requires AIR compilation
-        let mock = MockBackend::new();
-        let mut result = mock.prove(circuit_type, &[], public_inputs)?;
-        result.proving_time_ms = start.elapsed().as_millis() as u64;
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(BackendError::ProofFailed(format!(
+                "Stone prover exited with {}: {}",
+                output.status, stderr
+            )));
+        }
 
-        Ok(result)
+        // Read the generated proof
+        let proof_bytes = std::fs::read(&proof_output)
+            .map_err(|e| BackendError::ProofFailed(format!("Failed to read proof output: {}", e)))?;
+
+        let proving_time_ms = start.elapsed().as_millis() as u64;
+
+        tracing::info!(
+            "Stone prover completed in {}ms, proof size: {} bytes",
+            proving_time_ms,
+            proof_bytes.len()
+        );
+
+        Ok(ProofResult {
+            size_bytes: proof_bytes.len(),
+            proof_bytes,
+            public_inputs: public_inputs.to_vec(),
+            proving_time_ms,
+        })
     }
 
     fn verify(
@@ -334,9 +435,61 @@ impl ProverBackendTrait for StoneBackend {
         proof_bytes: &[u8],
         public_inputs: &[String],
     ) -> Result<VerifyResult, BackendError> {
-        // In production, use cpu_air_verifier
-        let mock = MockBackend::new();
-        mock.verify(circuit_type, proof_bytes, public_inputs)
+        use std::time::Instant;
+
+        let verifier_path = match &self.verifier_path {
+            Some(path) => path.clone(),
+            None => {
+                // Try to derive verifier path from prover path
+                let parent = self.prover_path.parent().unwrap_or(std::path::Path::new("."));
+                let verifier = parent.join("cpu_air_verifier");
+                if !verifier.exists() {
+                    tracing::warn!(
+                        "Stone verifier not found, falling back to mock verification"
+                    );
+                    let mock = MockBackend::new();
+                    return mock.verify(circuit_type, proof_bytes, public_inputs);
+                }
+                verifier
+            }
+        };
+
+        let start = Instant::now();
+
+        // Write proof to temp file
+        let work_dir = tempfile::tempdir()
+            .map_err(|e| BackendError::VerificationFailed(format!("Temp dir: {}", e)))?;
+
+        let proof_path = work_dir.path().join("proof.json");
+        std::fs::write(&proof_path, proof_bytes)
+            .map_err(|e| BackendError::VerificationFailed(format!("Write proof: {}", e)))?;
+
+        tracing::info!(
+            "Invoking Stone verifier for circuit '{}'",
+            circuit_type
+        );
+
+        let output = std::process::Command::new(&verifier_path)
+            .arg("--in_file")
+            .arg(&proof_path)
+            .output()
+            .map_err(|e| {
+                BackendError::VerificationFailed(format!("Failed to execute verifier: {}", e))
+            })?;
+
+        let verify_time_ms = start.elapsed().as_millis() as u64;
+        let valid = output.status.success();
+        let error = if valid {
+            None
+        } else {
+            Some(String::from_utf8_lossy(&output.stderr).to_string())
+        };
+
+        Ok(VerifyResult {
+            valid,
+            verify_time_ms,
+            error,
+        })
     }
 
     fn name(&self) -> &str {

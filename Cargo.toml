@@ -12,6 +12,7 @@ members = [
     "crates/fantasma-client-sdk",
     "crates/fantasma-db",
     "crates/fantasma-cli",
+    "crates/fantasma-wasm",
 ]
 
 [workspace.package]

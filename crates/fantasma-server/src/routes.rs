@@ -12,7 +12,7 @@ use fantasma_oidc::{
     scopes::{parse_scopes, ZkScope},
     token::{IdToken, IdTokenClaims, TokenResponse},
 };
-use fantasma_proof_store::{ProofStore, StoredProof};
+use fantasma_proof_store::StoredProof;
 use serde::{Deserialize, Serialize};
 
 use crate::state::AppState;

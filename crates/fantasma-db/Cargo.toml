@@ -9,6 +9,7 @@ repository.workspace = true
 [dependencies]
 fantasma-core = { workspace = true }
 fantasma-crypto = { workspace = true }
+fantasma-proof-store = { workspace = true }
 sqlx = { workspace = true }
 tokio = { workspace = true }
 serde = { workspace = true }

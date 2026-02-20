@@ -16,9 +16,12 @@ target/
 *.md
 !README.md
 
-# Node (wallet extension)
+# Node (wallet extension & admin dashboard)
 wallet-extension/node_modules/
 wallet-extension/dist/
+admin-dashboard/node_modules/
+admin-dashboard/build/
+admin-dashboard/.svelte-kit/
 
 # Examples (built separately)
 examples/

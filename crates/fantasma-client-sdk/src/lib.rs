@@ -58,10 +58,7 @@ impl FantasmaClient {
 
     /// Fetch a proof by reference
     pub async fn fetch_proof(&self, proof_ref: &ProofRef) -> Result<Vec<u8>, ClientError> {
-        let url = proof_ref
-            .url
-            .as_ref()
-            .ok_or(ClientError::ProofNotFound)?;
+        let url = proof_ref.url.as_ref().ok_or(ClientError::ProofNotFound)?;
 
         let response = self
             .client

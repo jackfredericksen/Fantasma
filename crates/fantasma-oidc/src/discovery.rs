@@ -83,7 +83,7 @@ impl DiscoveryDocument {
             id_token_signing_alg_values_supported: vec![
                 "HS256".to_string(), // For demo
                 "EdDSA".to_string(), // Classical
-                // In future: "MLDSA65".to_string(), // Dilithium
+                                     // In future: "MLDSA65".to_string(), // Dilithium
             ],
             claims_supported: vec![
                 "sub".to_string(),
@@ -105,7 +105,8 @@ impl DiscoveryDocument {
                     verification_key_hash: "0x...".to_string(),
                 },
                 credential_verification_v1: CircuitMetadata {
-                    description: "Proves credential possession without revealing details".to_string(),
+                    description: "Proves credential possession without revealing details"
+                        .to_string(),
                     bytecode_hash: "0x...".to_string(),
                     verification_key_hash: "0x...".to_string(),
                 },

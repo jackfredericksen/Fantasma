@@ -3,10 +3,10 @@
 //! This module provides integration with Cairo tooling via subprocess calls.
 //! In production, this could be replaced with native Rust bindings.
 
+use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use thiserror::Error;
-use serde::{Deserialize, Serialize};
 
 #[derive(Error, Debug)]
 pub enum CairoError {
@@ -233,7 +233,7 @@ impl AgeVerificationCircuit {
     /// Generate a proof for age verification
     pub fn prove(
         &self,
-        birthdate: u32,         // YYYYMMDD
+        birthdate: u32, // YYYYMMDD
         salt: [u8; 32],
         signature_hash: [u8; 32],
         threshold: u8,
@@ -262,17 +262,16 @@ impl AgeVerificationCircuit {
         }
 
         // Generate proof
-        let proof_bytes = if let (Some(trace), Some(memory)) =
-            (&result.trace_path, &result.memory_path)
-        {
-            self.runner.generate_proof(trace, memory)?
-        } else {
-            // Generate mock proof
-            self.runner.generate_proof(
-                &self.runner.work_dir.join("mock_trace.bin"),
-                &self.runner.work_dir.join("mock_memory.bin"),
-            )?
-        };
+        let proof_bytes =
+            if let (Some(trace), Some(memory)) = (&result.trace_path, &result.memory_path) {
+                self.runner.generate_proof(trace, memory)?
+            } else {
+                // Generate mock proof
+                self.runner.generate_proof(
+                    &self.runner.work_dir.join("mock_trace.bin"),
+                    &self.runner.work_dir.join("mock_memory.bin"),
+                )?
+            };
 
         Ok(AgeVerificationProof {
             proof_bytes,
@@ -324,13 +323,13 @@ mod tests {
         let circuit = AgeVerificationCircuit::new("/tmp/test-circuits").unwrap();
 
         let proof = circuit.prove(
-            20000101,           // Born Jan 1, 2000
-            [1u8; 32],          // Salt
-            [2u8; 32],          // Signature hash
-            21,                 // Threshold
-            20260210,           // Current date
-            [3u8; 32],          // Commitment
-            [4u8; 32],          // Issuer pubkey hash
+            20000101,  // Born Jan 1, 2000
+            [1u8; 32], // Salt
+            [2u8; 32], // Signature hash
+            21,        // Threshold
+            20260210,  // Current date
+            [3u8; 32], // Commitment
+            [4u8; 32], // Issuer pubkey hash
         );
 
         assert!(proof.is_ok());

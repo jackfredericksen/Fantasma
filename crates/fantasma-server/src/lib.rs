@@ -23,10 +23,16 @@ use state::AppState;
 fn admin_router() -> Router<AppState> {
     Router::new()
         .route("/stats", get(admin::stats))
-        .route("/clients", get(admin::list_clients).post(admin::create_client))
+        .route(
+            "/clients",
+            get(admin::list_clients).post(admin::create_client),
+        )
         .route("/clients/:id", delete(admin::delete_client))
         .route("/proofs", get(admin::list_proofs))
-        .route("/issuers", get(admin::list_issuers).post(admin::create_issuer))
+        .route(
+            "/issuers",
+            get(admin::list_issuers).post(admin::create_issuer),
+        )
         .route("/issuers/:id", delete(admin::delete_issuer))
         .route("/audit", get(admin::list_audit))
         .route("/health/detailed", get(admin::detailed_health))
@@ -85,7 +91,9 @@ fn core_routes() -> Router<AppState> {
 pub fn create_router(state: AppState) -> Router {
     core_routes()
         .with_state(state)
-        .layer(axum_middleware::from_fn(middleware::security_headers_middleware))
+        .layer(axum_middleware::from_fn(
+            middleware::security_headers_middleware,
+        ))
         .layer(cors_layer())
         .layer(TraceLayer::new_for_http())
 }
@@ -94,7 +102,9 @@ pub fn create_router(state: AppState) -> Router {
 pub fn create_secure_router(state: AppState) -> Router {
     core_routes()
         .with_state(state)
-        .layer(axum_middleware::from_fn(middleware::security_headers_middleware))
+        .layer(axum_middleware::from_fn(
+            middleware::security_headers_middleware,
+        ))
         .layer(cors_layer())
         .layer(TraceLayer::new_for_http())
 }

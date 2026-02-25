@@ -74,10 +74,34 @@ pub async fn stats(State(state): State<AppState>) -> Result<Json<AdminStats>, St
     let repos = state.repos().ok_or(StatusCode::SERVICE_UNAVAILABLE)?;
 
     let (clients, proofs, issuers, audit_entries) = tokio::try_join!(
-        async { repos.clients().count().await.map_err(|_| StatusCode::INTERNAL_SERVER_ERROR) },
-        async { repos.proofs().count().await.map_err(|_| StatusCode::INTERNAL_SERVER_ERROR) },
-        async { repos.issuers().count().await.map_err(|_| StatusCode::INTERNAL_SERVER_ERROR) },
-        async { repos.audit_log().count().await.map_err(|_| StatusCode::INTERNAL_SERVER_ERROR) },
+        async {
+            repos
+                .clients()
+                .count()
+                .await
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
+        },
+        async {
+            repos
+                .proofs()
+                .count()
+                .await
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
+        },
+        async {
+            repos
+                .issuers()
+                .count()
+                .await
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
+        },
+        async {
+            repos
+                .audit_log()
+                .count()
+                .await
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
+        },
     )?;
 
     Ok(Json(AdminStats {
@@ -235,7 +259,7 @@ pub async fn list_issuers(
 pub struct CreateIssuerRequest {
     pub issuer_id: String,
     pub name: String,
-    pub public_key: String,       // hex-encoded
+    pub public_key: String, // hex-encoded
     pub public_key_algorithm: String,
     pub verification_url: Option<String>,
     pub trusted: Option<bool>,
@@ -337,9 +361,7 @@ pub struct DatabaseHealth {
 }
 
 /// `GET /admin/health/detailed`
-pub async fn detailed_health(
-    State(state): State<AppState>,
-) -> Json<DetailedHealth> {
+pub async fn detailed_health(State(state): State<AppState>) -> Json<DetailedHealth> {
     let (connected, pool_size, pool_idle) = match &state.repos() {
         Some(repos) => {
             // Repos exist means we have a DB pool — try a lightweight check

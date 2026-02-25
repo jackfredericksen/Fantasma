@@ -45,7 +45,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Err(e) => {
             println!("   ✗ Failed to fetch discovery: {}", e);
-            println!("   Make sure the Fantasma server is running on {}", FANTASMA_ISSUER);
+            println!(
+                "   Make sure the Fantasma server is running on {}",
+                FANTASMA_ISSUER
+            );
             return Ok(());
         }
     };
@@ -58,16 +61,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let state = uuid::Uuid::new_v4().to_string();
     let nonce = uuid::Uuid::new_v4().to_string();
 
-    let auth_url = AuthorizationUrlBuilder::new(
-        &discovery.authorization_endpoint,
-        CLIENT_ID,
-        REDIRECT_URI,
-    )
-    .require_age(21) // Require user to be 21+
-    .require_kyc("basic") // Require basic KYC
-    .state(&state)
-    .nonce(&nonce)
-    .build();
+    let auth_url =
+        AuthorizationUrlBuilder::new(&discovery.authorization_endpoint, CLIENT_ID, REDIRECT_URI)
+            .require_age(21) // Require user to be 21+
+            .require_kyc("basic") // Require basic KYC
+            .state(&state)
+            .nonce(&nonce)
+            .build();
 
     println!("   Authorization URL:");
     println!("   {}", auth_url);
@@ -107,7 +107,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
-    println!("   Example claims: {}", serde_json::to_string_pretty(&example_claims)?);
+    println!(
+        "   Example claims: {}",
+        serde_json::to_string_pretty(&example_claims)?
+    );
     println!();
 
     // Verify age claim

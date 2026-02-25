@@ -40,7 +40,10 @@ pub async fn run(bind: String, _database_url: Option<String>) -> Result<()> {
     );
     println!("  Authorization: {}/authorize", format!("http://{}", bind));
     println!("  Token:         {}/token", format!("http://{}", bind));
-    println!("  JWKS:          {}/.well-known/jwks.json", format!("http://{}", bind));
+    println!(
+        "  JWKS:          {}/.well-known/jwks.json",
+        format!("http://{}", bind)
+    );
     println!();
     println!("{}", style("ZK Scopes:").bold());
     println!("  zk:age:18+      - Prove age >= 18");

@@ -8,8 +8,8 @@
 //! - Migration support via SQLx
 
 pub mod models;
-pub mod repos;
 pub mod pool;
+pub mod repos;
 
 pub use models::*;
 pub use pool::DatabasePool;

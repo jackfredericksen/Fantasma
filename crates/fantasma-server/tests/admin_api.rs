@@ -53,7 +53,11 @@ async fn test_admin_api() {
         )
         .await
         .unwrap();
-    assert_eq!(res.status(), StatusCode::UNAUTHORIZED, "no header should be 401");
+    assert_eq!(
+        res.status(),
+        StatusCode::UNAUTHORIZED,
+        "no header should be 401"
+    );
 
     // ── Auth: wrong key → 401 ───────────────────────────────
     let res = app
@@ -67,7 +71,11 @@ async fn test_admin_api() {
         )
         .await
         .unwrap();
-    assert_eq!(res.status(), StatusCode::UNAUTHORIZED, "wrong key should be 401");
+    assert_eq!(
+        res.status(),
+        StatusCode::UNAUTHORIZED,
+        "wrong key should be 401"
+    );
 
     // ── Stats: no DB → 503 ──────────────────────────────────
     let res = app
@@ -75,7 +83,11 @@ async fn test_admin_api() {
         .oneshot(admin_get("/admin/stats"))
         .await
         .unwrap();
-    assert_eq!(res.status(), StatusCode::SERVICE_UNAVAILABLE, "stats without DB");
+    assert_eq!(
+        res.status(),
+        StatusCode::SERVICE_UNAVAILABLE,
+        "stats without DB"
+    );
 
     // ── Clients: list → 503 ─────────────────────────────────
     let res = app
@@ -83,7 +95,11 @@ async fn test_admin_api() {
         .oneshot(admin_get("/admin/clients"))
         .await
         .unwrap();
-    assert_eq!(res.status(), StatusCode::SERVICE_UNAVAILABLE, "list clients without DB");
+    assert_eq!(
+        res.status(),
+        StatusCode::SERVICE_UNAVAILABLE,
+        "list clients without DB"
+    );
 
     // ── Clients: create → 500 (in-memory rejects registration)
     let body = serde_json::json!({
@@ -98,7 +114,11 @@ async fn test_admin_api() {
         .oneshot(admin_post("/admin/clients", &body))
         .await
         .unwrap();
-    assert_eq!(res.status(), StatusCode::INTERNAL_SERVER_ERROR, "create client without DB");
+    assert_eq!(
+        res.status(),
+        StatusCode::INTERNAL_SERVER_ERROR,
+        "create client without DB"
+    );
 
     // ── Proofs: list → 503 ──────────────────────────────────
     let res = app
@@ -106,7 +126,11 @@ async fn test_admin_api() {
         .oneshot(admin_get("/admin/proofs"))
         .await
         .unwrap();
-    assert_eq!(res.status(), StatusCode::SERVICE_UNAVAILABLE, "list proofs without DB");
+    assert_eq!(
+        res.status(),
+        StatusCode::SERVICE_UNAVAILABLE,
+        "list proofs without DB"
+    );
 
     // ── Issuers: list → 503 ─────────────────────────────────
     let res = app
@@ -114,7 +138,11 @@ async fn test_admin_api() {
         .oneshot(admin_get("/admin/issuers"))
         .await
         .unwrap();
-    assert_eq!(res.status(), StatusCode::SERVICE_UNAVAILABLE, "list issuers without DB");
+    assert_eq!(
+        res.status(),
+        StatusCode::SERVICE_UNAVAILABLE,
+        "list issuers without DB"
+    );
 
     // ── Audit: list → 503 ───────────────────────────────────
     let res = app
@@ -122,7 +150,11 @@ async fn test_admin_api() {
         .oneshot(admin_get("/admin/audit"))
         .await
         .unwrap();
-    assert_eq!(res.status(), StatusCode::SERVICE_UNAVAILABLE, "list audit without DB");
+    assert_eq!(
+        res.status(),
+        StatusCode::SERVICE_UNAVAILABLE,
+        "list audit without DB"
+    );
 
     // ── Health: detailed → 200 (always works) ───────────────
     let res = app
@@ -147,7 +179,11 @@ async fn test_admin_api() {
         .oneshot(admin_get("/admin/stats"))
         .await
         .unwrap();
-    assert_eq!(res.status(), StatusCode::SERVICE_UNAVAILABLE, "no key configured");
+    assert_eq!(
+        res.status(),
+        StatusCode::SERVICE_UNAVAILABLE,
+        "no key configured"
+    );
 
     // Restore for other test files that may run after us
     std::env::set_var("FANTASMA_ADMIN_KEY", ADMIN_KEY);

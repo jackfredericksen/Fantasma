@@ -92,7 +92,10 @@ pub async fn generate(credential_type: &str, output_file: &str) -> Result<()> {
             })
         }
         _ => {
-            bail!("Unknown credential type: {}. Supported: identity, kyc, degree", credential_type);
+            bail!(
+                "Unknown credential type: {}. Supported: identity, kyc, degree",
+                credential_type
+            );
         }
     };
 
@@ -124,7 +127,9 @@ pub async fn verify(credential_file: &str) -> Result<()> {
     let credential: serde_json::Value = serde_json::from_str(&content)?;
 
     let cred_type = credential["type"].as_str().unwrap_or("unknown");
-    let issuer_name = credential["issuer"]["name"].as_str().unwrap_or("Unknown Issuer");
+    let issuer_name = credential["issuer"]["name"]
+        .as_str()
+        .unwrap_or("Unknown Issuer");
 
     println!("  File:     {}", credential_file);
     println!("  Type:     {}", style(cred_type).cyan());
@@ -147,10 +152,7 @@ pub async fn verify(credential_file: &str) -> Result<()> {
         .unwrap_or("unknown");
 
     if sig_algo == "dilithium3" {
-        println!(
-            "{}",
-            style("✓ Credential structure valid").green().bold()
-        );
+        println!("{}", style("✓ Credential structure valid").green().bold());
         println!("  Signature algorithm: {}", style(sig_algo).cyan());
         println!();
         println!(
@@ -158,10 +160,7 @@ pub async fn verify(credential_file: &str) -> Result<()> {
             style("Note: Full signature verification requires issuer's public key.").dim()
         );
     } else {
-        println!(
-            "{}",
-            style("⚠ Unknown signature algorithm").yellow().bold()
-        );
+        println!("{}", style("⚠ Unknown signature algorithm").yellow().bold());
     }
 
     Ok(())

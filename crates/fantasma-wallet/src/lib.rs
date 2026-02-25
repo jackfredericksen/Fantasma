@@ -82,10 +82,7 @@ impl Wallet {
     }
 
     /// Find credentials matching a claim type
-    pub fn find_credentials_for_claim(
-        &self,
-        claim: &fantasma_core::ClaimType,
-    ) -> Vec<&Credential> {
+    pub fn find_credentials_for_claim(&self, claim: &fantasma_core::ClaimType) -> Vec<&Credential> {
         self.credentials
             .values()
             .filter(|c| credential_supports_claim(c, claim))
@@ -111,10 +108,7 @@ impl Drop for Wallet {
 }
 
 /// Check if a credential can be used for a specific claim
-fn credential_supports_claim(
-    credential: &Credential,
-    claim: &fantasma_core::ClaimType,
-) -> bool {
+fn credential_supports_claim(credential: &Credential, claim: &fantasma_core::ClaimType) -> bool {
     use fantasma_core::claim::ClaimType;
     use fantasma_core::credential::CredentialType;
 
@@ -122,7 +116,9 @@ fn credential_supports_claim(
         ClaimType::AgeAtLeast { .. } => {
             matches!(credential.credential_type, CredentialType::Identity { .. })
         }
-        ClaimType::HoldsCredential { credential_type, .. } => {
+        ClaimType::HoldsCredential {
+            credential_type, ..
+        } => {
             if credential_type == "*" {
                 return true;
             }

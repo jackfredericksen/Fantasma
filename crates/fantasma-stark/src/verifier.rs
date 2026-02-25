@@ -60,7 +60,10 @@ impl Verifier {
     }
 
     /// Load verification key for a circuit
-    pub fn load_verification_key(&mut self, circuit_type: CircuitType) -> Result<(), VerifierError> {
+    pub fn load_verification_key(
+        &mut self,
+        circuit_type: CircuitType,
+    ) -> Result<(), VerifierError> {
         // In a real implementation, this would load the actual verification key
         let vk = VerificationKey {
             _circuit_type: circuit_type,

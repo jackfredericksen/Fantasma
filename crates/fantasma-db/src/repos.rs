@@ -39,12 +39,10 @@ impl ClientRepo {
     }
 
     pub async fn find_by_client_id(&self, client_id: &str) -> Result<Option<Client>> {
-        let result = sqlx::query_as::<_, Client>(
-            "SELECT * FROM clients WHERE client_id = $1",
-        )
-        .bind(client_id)
-        .fetch_optional(&self.pool)
-        .await?;
+        let result = sqlx::query_as::<_, Client>("SELECT * FROM clients WHERE client_id = $1")
+            .bind(client_id)
+            .fetch_optional(&self.pool)
+            .await?;
 
         Ok(result)
     }
@@ -84,7 +82,10 @@ impl ClientRepo {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(DbError::NotFound(format!("Client not found: {}", client_id)));
+            return Err(DbError::NotFound(format!(
+                "Client not found: {}",
+                client_id
+            )));
         }
 
         Ok(())
@@ -189,23 +190,19 @@ impl ProofRepo {
     }
 
     pub async fn find_by_proof_id(&self, proof_id: &str) -> Result<Option<StoredProof>> {
-        let result = sqlx::query_as::<_, StoredProof>(
-            "SELECT * FROM proofs WHERE proof_id = $1",
-        )
-        .bind(proof_id)
-        .fetch_optional(&self.pool)
-        .await?;
+        let result = sqlx::query_as::<_, StoredProof>("SELECT * FROM proofs WHERE proof_id = $1")
+            .bind(proof_id)
+            .fetch_optional(&self.pool)
+            .await?;
 
         Ok(result)
     }
 
     pub async fn find_by_hash(&self, proof_hash: &[u8]) -> Result<Option<StoredProof>> {
-        let result = sqlx::query_as::<_, StoredProof>(
-            "SELECT * FROM proofs WHERE proof_hash = $1",
-        )
-        .bind(proof_hash)
-        .fetch_optional(&self.pool)
-        .await?;
+        let result = sqlx::query_as::<_, StoredProof>("SELECT * FROM proofs WHERE proof_hash = $1")
+            .bind(proof_hash)
+            .fetch_optional(&self.pool)
+            .await?;
 
         Ok(result)
     }
@@ -344,7 +341,9 @@ impl ProofStore for PostgresProofStore {
             hash,
             circuit_type: stored.circuit_type,
             stored_at: stored.created_at,
-            expires_at: stored.expires_at.unwrap_or(stored.created_at + chrono::Duration::hours(1)),
+            expires_at: stored
+                .expires_at
+                .unwrap_or(stored.created_at + chrono::Duration::hours(1)),
         })
     }
 
@@ -458,7 +457,10 @@ impl CredentialRepo {
         Ok(result)
     }
 
-    pub async fn find_by_credential_id(&self, credential_id: &[u8]) -> Result<Option<StoredCredential>> {
+    pub async fn find_by_credential_id(
+        &self,
+        credential_id: &[u8],
+    ) -> Result<Option<StoredCredential>> {
         let result = sqlx::query_as::<_, StoredCredential>(
             "SELECT * FROM credentials WHERE credential_id = $1 AND revoked_at IS NULL",
         )
@@ -521,22 +523,19 @@ impl IssuerRepo {
     }
 
     pub async fn find_by_issuer_id(&self, issuer_id: &str) -> Result<Option<Issuer>> {
-        let result = sqlx::query_as::<_, Issuer>(
-            "SELECT * FROM issuers WHERE issuer_id = $1",
-        )
-        .bind(issuer_id)
-        .fetch_optional(&self.pool)
-        .await?;
+        let result = sqlx::query_as::<_, Issuer>("SELECT * FROM issuers WHERE issuer_id = $1")
+            .bind(issuer_id)
+            .fetch_optional(&self.pool)
+            .await?;
 
         Ok(result)
     }
 
     pub async fn list_trusted(&self) -> Result<Vec<Issuer>> {
-        let results = sqlx::query_as::<_, Issuer>(
-            "SELECT * FROM issuers WHERE trusted = true ORDER BY name",
-        )
-        .fetch_all(&self.pool)
-        .await?;
+        let results =
+            sqlx::query_as::<_, Issuer>("SELECT * FROM issuers WHERE trusted = true ORDER BY name")
+                .fetch_all(&self.pool)
+                .await?;
 
         Ok(results)
     }
@@ -552,11 +551,9 @@ impl IssuerRepo {
     }
 
     pub async fn list_all(&self) -> Result<Vec<Issuer>> {
-        let results = sqlx::query_as::<_, Issuer>(
-            "SELECT * FROM issuers ORDER BY name",
-        )
-        .fetch_all(&self.pool)
-        .await?;
+        let results = sqlx::query_as::<_, Issuer>("SELECT * FROM issuers ORDER BY name")
+            .fetch_all(&self.pool)
+            .await?;
 
         Ok(results)
     }

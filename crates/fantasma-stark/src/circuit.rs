@@ -60,7 +60,7 @@ impl Circuit {
             version: "1.0.0".to_string(),
             description: "Proves age >= threshold without revealing birthdate".to_string(),
             bytecode_hash: [0u8; 32], // Placeholder - set after compilation
-            public_input_count: 4,     // threshold, date, commitment, issuer
+            public_input_count: 4,    // threshold, date, commitment, issuer
         }
     }
 
@@ -143,9 +143,16 @@ impl CircuitLoader {
                 sierra_path.display()
             );
             // Fall back to placeholder circuits
-            loader.circuits.insert(CircuitType::AgeVerification, Circuit::age_verification());
-            loader.circuits.insert(CircuitType::CredentialVerification, Circuit::credential_verification());
-            loader.circuits.insert(CircuitType::KycVerification, Circuit::kyc_verification());
+            loader
+                .circuits
+                .insert(CircuitType::AgeVerification, Circuit::age_verification());
+            loader.circuits.insert(
+                CircuitType::CredentialVerification,
+                Circuit::credential_verification(),
+            );
+            loader
+                .circuits
+                .insert(CircuitType::KycVerification, Circuit::kyc_verification());
         }
 
         Ok(loader)
@@ -154,9 +161,16 @@ impl CircuitLoader {
     /// Load with placeholder hashes (for development/testing)
     pub fn with_defaults() -> Self {
         let mut loader = Self::new();
-        loader.circuits.insert(CircuitType::AgeVerification, Circuit::age_verification());
-        loader.circuits.insert(CircuitType::CredentialVerification, Circuit::credential_verification());
-        loader.circuits.insert(CircuitType::KycVerification, Circuit::kyc_verification());
+        loader
+            .circuits
+            .insert(CircuitType::AgeVerification, Circuit::age_verification());
+        loader.circuits.insert(
+            CircuitType::CredentialVerification,
+            Circuit::credential_verification(),
+        );
+        loader
+            .circuits
+            .insert(CircuitType::KycVerification, Circuit::kyc_verification());
         loader
     }
 

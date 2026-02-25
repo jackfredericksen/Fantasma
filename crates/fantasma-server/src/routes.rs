@@ -116,7 +116,10 @@ pub async fn authorize(
     }
 
     // Validate client and redirect URI
-    if !state.validate_redirect_uri(&params.client_id, &params.redirect_uri).await {
+    if !state
+        .validate_redirect_uri(&params.client_id, &params.redirect_uri)
+        .await
+    {
         return Html("<h1>Error</h1><p>Invalid client or redirect URI</p>".to_string())
             .into_response();
     }
@@ -142,7 +145,11 @@ pub async fn authorize(
     let deny_url = format!(
         "{}?error=access_denied&error_description=User%20denied%20access{}",
         params.redirect_uri,
-        params.state.as_ref().map(|s| format!("&state={}", s)).unwrap_or_default()
+        params
+            .state
+            .as_ref()
+            .map(|s| format!("&state={}", s))
+            .unwrap_or_default()
     );
 
     // Render the template
@@ -253,7 +260,10 @@ fn build_user_options_html(scopes: &[ZkScope]) -> String {
             .map(|(label, passes)| {
                 let class = if *passes { "badge-pass" } else { "badge-fail" };
                 let icon = if *passes { "✓" } else { "✗" };
-                format!(r#"<span class="user-badge {}">{} {}</span>"#, class, icon, label)
+                format!(
+                    r#"<span class="user-badge {}">{} {}</span>"#,
+                    class, icon, label
+                )
             })
             .collect::<Vec<_>>()
             .join("");
@@ -288,39 +298,42 @@ fn build_permissions_html(scopes: &[ZkScope]) -> String {
     let mut html = String::new();
 
     for scope in scopes {
-        let (icon_class, icon, title, description, has_zk): (&str, &str, String, &str, bool) = match scope {
-            ZkScope::OpenId => (
-                "identity",
-                "&#128100;",
-                "Basic Identity".to_string(),
-                "A pseudonymous identifier for this service",
-                false,
-            ),
-            ZkScope::Age { threshold } => (
-                "age",
-                "&#127874;",
-                format!("Age {} or older", threshold),
-                "Proves you meet the age requirement without revealing your birthdate",
-                true,
-            ),
-            ZkScope::Credential { credential_type } => {
-                let cred_name = credential_type.clone().unwrap_or_else(|| "credential".to_string());
-                (
-                    "credential",
-                    "&#128196;",
-                    format!("{} verification", cred_name),
-                    "Proves you hold this credential without revealing details",
+        let (icon_class, icon, title, description, has_zk): (&str, &str, String, &str, bool) =
+            match scope {
+                ZkScope::OpenId => (
+                    "identity",
+                    "&#128100;",
+                    "Basic Identity".to_string(),
+                    "A pseudonymous identifier for this service",
+                    false,
+                ),
+                ZkScope::Age { threshold } => (
+                    "age",
+                    "&#127874;",
+                    format!("Age {} or older", threshold),
+                    "Proves you meet the age requirement without revealing your birthdate",
                     true,
-                )
-            }
-            ZkScope::Kyc { level } => (
-                "kyc",
-                "&#9989;",
-                format!("KYC {} status", level.as_str()),
-                "Proves your identity verification status without personal data",
-                true,
-            ),
-        };
+                ),
+                ZkScope::Credential { credential_type } => {
+                    let cred_name = credential_type
+                        .clone()
+                        .unwrap_or_else(|| "credential".to_string());
+                    (
+                        "credential",
+                        "&#128196;",
+                        format!("{} verification", cred_name),
+                        "Proves you hold this credential without revealing details",
+                        true,
+                    )
+                }
+                ZkScope::Kyc { level } => (
+                    "kyc",
+                    "&#9989;",
+                    format!("KYC {} status", level.as_str()),
+                    "Proves your identity verification status without personal data",
+                    true,
+                ),
+            };
 
         let zk_badge = if has_zk {
             r#"<span class="zk-badge">Zero-Knowledge Proof</span>"#
@@ -348,7 +361,10 @@ fn build_permissions_html(scopes: &[ZkScope]) -> String {
 #[allow(dead_code)]
 fn build_query_string(params: &AuthorizeParams) -> String {
     let mut parts = vec![
-        format!("response_type={}", urlencoding::encode(&params.response_type)),
+        format!(
+            "response_type={}",
+            urlencoding::encode(&params.response_type)
+        ),
         format!("client_id={}", urlencoding::encode(&params.client_id)),
         format!("redirect_uri={}", urlencoding::encode(&params.redirect_uri)),
         format!("scope={}", urlencoding::encode(&params.scope)),
@@ -364,7 +380,10 @@ fn build_query_string(params: &AuthorizeParams) -> String {
         parts.push(format!("code_challenge={}", urlencoding::encode(challenge)));
     }
     if let Some(ref method) = params.code_challenge_method {
-        parts.push(format!("code_challenge_method={}", urlencoding::encode(method)));
+        parts.push(format!(
+            "code_challenge_method={}",
+            urlencoding::encode(method)
+        ));
     }
 
     parts.join("&")
@@ -711,13 +730,19 @@ pub async fn demo_users() -> Json<serde_json::Value> {
                     fantasma_core::credential::CredentialType::Kyc { level, .. } => {
                         format!("KYC ({})", level.as_str())
                     }
-                    fantasma_core::credential::CredentialType::Degree { degree_type, field_of_study, .. } => {
+                    fantasma_core::credential::CredentialType::Degree {
+                        degree_type,
+                        field_of_study,
+                        ..
+                    } => {
                         format!("{} in {}", degree_type, field_of_study)
                     }
                     fantasma_core::credential::CredentialType::License { license_type, .. } => {
                         format!("License: {}", license_type)
                     }
-                    fantasma_core::credential::CredentialType::Membership { organization, .. } => {
+                    fantasma_core::credential::CredentialType::Membership {
+                        organization, ..
+                    } => {
                         format!("Member: {}", organization)
                     }
                 })

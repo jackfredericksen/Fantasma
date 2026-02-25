@@ -10,9 +10,21 @@ pub async fn list() -> Result<()> {
 
     // Demo clients (always available)
     let demo_clients = vec![
-        ("demo-client", "Demo Client", vec!["http://localhost:8080/callback"]),
-        ("demo-rp", "Demo Relying Party", vec!["http://localhost:8080/callback"]),
-        ("fantasma-wallet", "Fantasma Wallet", vec!["chrome-extension://*/callback"]),
+        (
+            "demo-client",
+            "Demo Client",
+            vec!["http://localhost:8080/callback"],
+        ),
+        (
+            "demo-rp",
+            "Demo Relying Party",
+            vec!["http://localhost:8080/callback"],
+        ),
+        (
+            "fantasma-wallet",
+            "Fantasma Wallet",
+            vec!["chrome-extension://*/callback"],
+        ),
     ];
 
     for (id, name, uris) in demo_clients {
@@ -105,7 +117,10 @@ pub async fn show(client_id: &str) -> Result<()> {
             println!("    - moz-extension://*/callback");
         }
         _ => {
-            println!("  {}", style(format!("Client '{}' not found", client_id)).red());
+            println!(
+                "  {}",
+                style(format!("Client '{}' not found", client_id)).red()
+            );
         }
     }
 

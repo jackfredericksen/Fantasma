@@ -84,12 +84,8 @@ impl ProverConfig {
         Self {
             backend: std::env::var("FANTASMA_PROVER_BACKEND")
                 .unwrap_or_else(|_| "mock".to_string()),
-            stone_prover_path: std::env::var("STONE_PROVER_PATH")
-                .ok()
-                .map(PathBuf::from),
-            stone_verifier_path: std::env::var("STONE_VERIFIER_PATH")
-                .ok()
-                .map(PathBuf::from),
+            stone_prover_path: std::env::var("STONE_PROVER_PATH").ok().map(PathBuf::from),
+            stone_verifier_path: std::env::var("STONE_VERIFIER_PATH").ok().map(PathBuf::from),
             num_threads: std::env::var("FANTASMA_PROVER_THREADS")
                 .ok()
                 .and_then(|s| s.parse().ok()),
@@ -298,10 +294,7 @@ impl StoneBackend {
     }
 
     /// Write Stone prover config to a temp file
-    fn write_prover_config(
-        &self,
-        dir: &std::path::Path,
-    ) -> Result<PathBuf, BackendError> {
+    fn write_prover_config(&self, dir: &std::path::Path) -> Result<PathBuf, BackendError> {
         let config = crate::stone_config::StoneProverConfig::default();
         let config_path = dir.join("prover_config.json");
         let config_json = serde_json::to_string_pretty(&config)
@@ -311,10 +304,7 @@ impl StoneBackend {
     }
 
     /// Write Stone prover parameters to a temp file
-    fn write_prover_params(
-        &self,
-        dir: &std::path::Path,
-    ) -> Result<PathBuf, BackendError> {
+    fn write_prover_params(&self, dir: &std::path::Path) -> Result<PathBuf, BackendError> {
         let params = crate::stone_config::StoneProverParameters::default();
         let params_path = dir.join("prover_params.json");
         let params_json = serde_json::to_string_pretty(&params)
@@ -410,8 +400,9 @@ impl ProverBackendTrait for StoneBackend {
         }
 
         // Read the generated proof
-        let proof_bytes = std::fs::read(&proof_output)
-            .map_err(|e| BackendError::ProofFailed(format!("Failed to read proof output: {}", e)))?;
+        let proof_bytes = std::fs::read(&proof_output).map_err(|e| {
+            BackendError::ProofFailed(format!("Failed to read proof output: {}", e))
+        })?;
 
         let proving_time_ms = start.elapsed().as_millis() as u64;
 
@@ -441,12 +432,13 @@ impl ProverBackendTrait for StoneBackend {
             Some(path) => path.clone(),
             None => {
                 // Try to derive verifier path from prover path
-                let parent = self.prover_path.parent().unwrap_or(std::path::Path::new("."));
+                let parent = self
+                    .prover_path
+                    .parent()
+                    .unwrap_or(std::path::Path::new("."));
                 let verifier = parent.join("cpu_air_verifier");
                 if !verifier.exists() {
-                    tracing::warn!(
-                        "Stone verifier not found, falling back to mock verification"
-                    );
+                    tracing::warn!("Stone verifier not found, falling back to mock verification");
                     let mock = MockBackend::new();
                     return mock.verify(circuit_type, proof_bytes, public_inputs);
                 }
@@ -464,10 +456,7 @@ impl ProverBackendTrait for StoneBackend {
         std::fs::write(&proof_path, proof_bytes)
             .map_err(|e| BackendError::VerificationFailed(format!("Write proof: {}", e)))?;
 
-        tracing::info!(
-            "Invoking Stone verifier for circuit '{}'",
-            circuit_type
-        );
+        tracing::info!("Invoking Stone verifier for circuit '{}'", circuit_type);
 
         let output = std::process::Command::new(&verifier_path)
             .arg("--in_file")
@@ -596,7 +585,11 @@ mod tests {
         assert_eq!(result.size_bytes, 100_000);
 
         let verify = backend
-            .verify("age_verification", &result.proof_bytes, &["0x15".to_string()])
+            .verify(
+                "age_verification",
+                &result.proof_bytes,
+                &["0x15".to_string()],
+            )
             .unwrap();
 
         assert!(verify.valid);

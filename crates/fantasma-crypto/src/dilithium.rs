@@ -54,7 +54,11 @@ impl DilithiumPublicKey {
     }
 
     /// Verify a signature
-    pub fn verify(&self, message: &[u8], signature: &DilithiumSignature) -> Result<(), DilithiumError> {
+    pub fn verify(
+        &self,
+        message: &[u8],
+        signature: &DilithiumSignature,
+    ) -> Result<(), DilithiumError> {
         let pk = dilithium3::PublicKey::from_bytes(&self.bytes)
             .map_err(|_| DilithiumError::InvalidPublicKey)?;
 
@@ -180,7 +184,11 @@ impl DilithiumKeypair {
     }
 
     /// Verify a signature
-    pub fn verify(&self, message: &[u8], signature: &DilithiumSignature) -> Result<(), DilithiumError> {
+    pub fn verify(
+        &self,
+        message: &[u8],
+        signature: &DilithiumSignature,
+    ) -> Result<(), DilithiumError> {
         self.public_key.verify(message, signature)
     }
 }

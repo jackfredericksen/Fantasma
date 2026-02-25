@@ -446,8 +446,7 @@ pub fn generate_witness(
                 .ok_or("Credential has no birthdate")?;
 
             let now = chrono::Utc::now();
-            let verification_date =
-                now.year() as u32 * 10000 + now.month() * 100 + now.day();
+            let verification_date = now.year() as u32 * 10000 + now.month() * 100 + now.day();
 
             let builder = AgeVerificationWitnessBuilder::new()
                 .birthdate(
@@ -515,7 +514,11 @@ pub fn generate_witness(
 
             // Compute nullifier: H(H(credential_leaf, user_secret), verifier_domain, nonce)
             let credential_leaf = sha3_256(
-                &[credential_type_bytes.as_slice(), credential.commitment.as_slice()].concat(),
+                &[
+                    credential_type_bytes.as_slice(),
+                    credential.commitment.as_slice(),
+                ]
+                .concat(),
             );
             let inner = sha3_256(&[credential_leaf.as_slice(), user_secret.as_slice()].concat());
             let domain_bound =

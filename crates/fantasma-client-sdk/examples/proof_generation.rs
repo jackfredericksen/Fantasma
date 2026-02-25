@@ -31,21 +31,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Private inputs (witness) - never revealed
     let private_inputs = vec![
-        "19900115".to_string(), // birthdate: Jan 15, 1990
+        "19900115".to_string(),   // birthdate: Jan 15, 1990
         "salt_12345".to_string(), // random salt
     ];
 
     // Public inputs - verifier sees these
     let public_inputs = vec![
-        "21".to_string(),        // threshold age
-        "20260212".to_string(),  // verification date
+        "21".to_string(),              // threshold age
+        "20260212".to_string(),        // verification date
         "commitment_hash".to_string(), // credential commitment
     ];
 
     let result = prover.prove("age_verification", &private_inputs, &public_inputs)?;
 
     println!("Proof generated!");
-    println!("  Proof size: {} bytes (~{} KB)", result.size_bytes, result.size_bytes / 1024);
+    println!(
+        "  Proof size: {} bytes (~{} KB)",
+        result.size_bytes,
+        result.size_bytes / 1024
+    );
     println!("  Proving time: {} ms", result.proving_time_ms);
     println!("  Public inputs: {:?}", result.public_inputs);
     println!();
@@ -57,7 +61,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let verify_result = prover.verify("age_verification", &result.proof_bytes, &public_inputs)?;
     println!(
         "Verification: {}",
-        if verify_result.valid { "✓ VALID" } else { "✗ INVALID" }
+        if verify_result.valid {
+            "✓ VALID"
+        } else {
+            "✗ INVALID"
+        }
     );
     println!();
 
@@ -72,14 +80,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let kyc_private = vec![
         "user_id_hash".to_string(),
         "kyc_provider_id".to_string(),
-        "2".to_string(), // KYC level: Enhanced
+        "2".to_string(),          // KYC level: Enhanced
         "1700000000".to_string(), // verification timestamp
         "kyc_data_hash".to_string(),
     ];
 
     let kyc_public = vec![
-        "2".to_string(),        // expected level (Enhanced)
-        "31536000".to_string(), // max age: 1 year
+        "2".to_string(),          // expected level (Enhanced)
+        "31536000".to_string(),   // max age: 1 year
         "1705000000".to_string(), // current timestamp
         "provider_pubkey_hash".to_string(),
     ];

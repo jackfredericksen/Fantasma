@@ -145,13 +145,19 @@ pub fn generate_credential_witness(
     let proof_elements: Vec<String> = if merkle_proof_hex.is_empty() {
         vec![]
     } else {
-        merkle_proof_hex.split(',').map(|s| s.trim().to_string()).collect()
+        merkle_proof_hex
+            .split(',')
+            .map(|s| s.trim().to_string())
+            .collect()
     };
 
     let index_elements: Vec<String> = if merkle_indices.is_empty() {
         vec![]
     } else {
-        merkle_indices.split(',').map(|s| s.trim().to_string()).collect()
+        merkle_indices
+            .split(',')
+            .map(|s| s.trim().to_string())
+            .collect()
     };
 
     let result = WitnessResult {

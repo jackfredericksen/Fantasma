@@ -70,7 +70,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let id_token = create_example_token();
 
     println!("1. Received ID Token (truncated):");
-    println!("   {}...{}", &id_token[..50], &id_token[id_token.len()-20..]);
+    println!(
+        "   {}...{}",
+        &id_token[..50],
+        &id_token[id_token.len() - 20..]
+    );
     println!();
 
     // Decode the token (without signature verification for this example)
@@ -90,10 +94,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if let Some(ref age_claim) = claims.zk_age_claim {
         println!("   Age Claim:");
         println!("     Threshold: {}+", age_claim.threshold);
-        println!("     Verified:  {}", if age_claim.verified { "✓ YES" } else { "✗ NO" });
+        println!(
+            "     Verified:  {}",
+            if age_claim.verified {
+                "✓ YES"
+            } else {
+                "✗ NO"
+            }
+        );
 
         if age_claim.verified {
-            println!("     → User is verified to be {} years or older", age_claim.threshold);
+            println!(
+                "     → User is verified to be {} years or older",
+                age_claim.threshold
+            );
         } else {
             println!("     → User did NOT meet the age requirement");
         }
@@ -109,7 +123,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if let Some(ref kyc_claim) = claims.zk_kyc_claim {
         println!("   KYC Claim:");
         println!("     Level:    {}", kyc_claim.level);
-        println!("     Verified: {}", if kyc_claim.verified { "✓ YES" } else { "✗ NO" });
+        println!(
+            "     Verified: {}",
+            if kyc_claim.verified {
+                "✓ YES"
+            } else {
+                "✗ NO"
+            }
+        );
 
         if kyc_claim.verified {
             println!("     → User has {} KYC verification", kyc_claim.level);
@@ -118,7 +139,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
 
         if let Some(max_age) = kyc_claim.max_age {
-            println!("     Max Age: {} seconds ({} days)", max_age, max_age / 86400);
+            println!(
+                "     Max Age: {} seconds ({} days)",
+                max_age,
+                max_age / 86400
+            );
         }
         println!();
     }
@@ -127,10 +152,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if let Some(ref cred_claim) = claims.zk_credential_claim {
         println!("   Credential Claim:");
         println!("     Type:     {}", cred_claim.credential_type);
-        println!("     Verified: {}", if cred_claim.verified { "✓ YES" } else { "✗ NO" });
+        println!(
+            "     Verified: {}",
+            if cred_claim.verified {
+                "✓ YES"
+            } else {
+                "✗ NO"
+            }
+        );
 
         if cred_claim.verified {
-            println!("     → User holds a valid '{}' credential", cred_claim.credential_type);
+            println!(
+                "     → User holds a valid '{}' credential",
+                cred_claim.credential_type
+            );
         } else {
             println!("     → User does NOT hold the required credential");
         }
@@ -141,8 +176,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("4. Access Control Decision:");
     println!();
 
-    let age_ok = claims.zk_age_claim.as_ref().map(|c| c.verified).unwrap_or(false);
-    let kyc_ok = claims.zk_kyc_claim.as_ref().map(|c| c.verified).unwrap_or(false);
+    let age_ok = claims
+        .zk_age_claim
+        .as_ref()
+        .map(|c| c.verified)
+        .unwrap_or(false);
+    let kyc_ok = claims
+        .zk_kyc_claim
+        .as_ref()
+        .map(|c| c.verified)
+        .unwrap_or(false);
 
     if age_ok && kyc_ok {
         println!("   ✓ ACCESS GRANTED");
@@ -176,9 +219,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 fn create_example_token() -> String {
     // Create a mock ID token for demonstration
-    let header = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(
-        r#"{"alg":"RS256","typ":"JWT"}"#
-    );
+    let header =
+        base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(r#"{"alg":"RS256","typ":"JWT"}"#);
 
     let claims = serde_json::json!({
         "iss": "http://localhost:3000",
@@ -209,13 +251,11 @@ fn create_example_token() -> String {
         }
     });
 
-    let payload = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(
-        serde_json::to_string(&claims).unwrap()
-    );
+    let payload = base64::engine::general_purpose::URL_SAFE_NO_PAD
+        .encode(serde_json::to_string(&claims).unwrap());
 
-    let signature = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(
-        "mock_signature_for_demonstration"
-    );
+    let signature =
+        base64::engine::general_purpose::URL_SAFE_NO_PAD.encode("mock_signature_for_demonstration");
 
     format!("{}.{}.{}", header, payload, signature)
 }

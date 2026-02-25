@@ -29,9 +29,9 @@ pub struct RateLimiterConfig {
 impl Default for RateLimiterConfig {
     fn default() -> Self {
         Self {
-            max_requests: 100,        // 100 requests
+            max_requests: 100,               // 100 requests
             window: Duration::from_secs(60), // per minute
-            burst: 10,                // with burst of 10
+            burst: 10,                       // with burst of 10
         }
     }
 }
@@ -125,45 +125,31 @@ pub async fn rate_limit_middleware(
     let mut response = next.run(request).await;
 
     // Add rate limit headers (informational)
-    response.headers_mut().insert(
-        "X-RateLimit-Limit",
-        "100".parse().unwrap(),
-    );
-    response.headers_mut().insert(
-        "X-RateLimit-Remaining",
-        "99".parse().unwrap(),
-    );
+    response
+        .headers_mut()
+        .insert("X-RateLimit-Limit", "100".parse().unwrap());
+    response
+        .headers_mut()
+        .insert("X-RateLimit-Remaining", "99".parse().unwrap());
 
     response
 }
 
 /// Security headers middleware
-pub async fn security_headers_middleware(
-    request: Request<Body>,
-    next: Next,
-) -> Response {
+pub async fn security_headers_middleware(request: Request<Body>, next: Next) -> Response {
     let mut response = next.run(request).await;
 
     // Add security headers
     let headers = response.headers_mut();
 
     // Prevent clickjacking
-    headers.insert(
-        header::X_FRAME_OPTIONS,
-        "DENY".parse().unwrap(),
-    );
+    headers.insert(header::X_FRAME_OPTIONS, "DENY".parse().unwrap());
 
     // Prevent MIME type sniffing
-    headers.insert(
-        header::X_CONTENT_TYPE_OPTIONS,
-        "nosniff".parse().unwrap(),
-    );
+    headers.insert(header::X_CONTENT_TYPE_OPTIONS, "nosniff".parse().unwrap());
 
     // Enable XSS protection
-    headers.insert(
-        "X-XSS-Protection",
-        "1; mode=block".parse().unwrap(),
-    );
+    headers.insert("X-XSS-Protection", "1; mode=block".parse().unwrap());
 
     // Referrer policy
     headers.insert(

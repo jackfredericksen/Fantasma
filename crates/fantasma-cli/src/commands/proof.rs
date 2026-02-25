@@ -89,7 +89,10 @@ pub async fn generate(circuit: &str, input_file: &str, output_file: &str) -> Res
     pb.finish_with_message("Done!");
     println!();
 
-    println!("{}", style("✓ Proof generated successfully!").green().bold());
+    println!(
+        "{}",
+        style("✓ Proof generated successfully!").green().bold()
+    );
     println!();
     println!("  Proof size:    {} bytes", style(result.size_bytes).cyan());
     println!(

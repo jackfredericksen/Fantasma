@@ -256,11 +256,9 @@ async fn test_full_oidc_flow() {
     assert_eq!(parts.len(), 3); // Header.Payload.Signature
 
     // Decode payload
-    let payload = base64::Engine::decode(
-        &base64::engine::general_purpose::URL_SAFE_NO_PAD,
-        parts[1],
-    )
-    .unwrap();
+    let payload =
+        base64::Engine::decode(&base64::engine::general_purpose::URL_SAFE_NO_PAD, parts[1])
+            .unwrap();
     let claims: Value = serde_json::from_slice(&payload).unwrap();
 
     // Verify ZK claims
@@ -365,11 +363,9 @@ async fn test_underage_user_fails_21_check() {
 
     let id_token = json["id_token"].as_str().unwrap();
     let parts: Vec<&str> = id_token.split('.').collect();
-    let payload = base64::Engine::decode(
-        &base64::engine::general_purpose::URL_SAFE_NO_PAD,
-        parts[1],
-    )
-    .unwrap();
+    let payload =
+        base64::Engine::decode(&base64::engine::general_purpose::URL_SAFE_NO_PAD, parts[1])
+            .unwrap();
     let claims: Value = serde_json::from_slice(&payload).unwrap();
 
     // Bob's age verification for 21+ should fail

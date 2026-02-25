@@ -14,10 +14,14 @@ pub async fn migrate(database_url: Option<String>) -> Result<()> {
     };
 
     println!("Connecting to database...");
-    let pool = DatabasePool::new(&config).await.map_err(|e| anyhow::anyhow!(e))?;
+    let pool = DatabasePool::new(&config)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
 
     println!("Running migrations...");
-    pool.run_migrations().await.map_err(|e| anyhow::anyhow!(e))?;
+    pool.run_migrations()
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
 
     println!("Migrations completed successfully.");
     pool.close().await;
@@ -93,7 +97,9 @@ pub async fn seed(database_url: Option<String>) -> Result<()> {
     };
 
     println!("Connecting to database...");
-    let pool = DatabasePool::new(&config).await.map_err(|e| anyhow::anyhow!(e))?;
+    let pool = DatabasePool::new(&config)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
     let repos = fantasma_db::pool::Repositories::new(&pool);
 
     // Seed demo clients
